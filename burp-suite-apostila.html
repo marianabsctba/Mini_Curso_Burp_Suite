@@ -1,0 +1,3495 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Curso — Burp Suite Community | Be Safe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════
+   BURP SUITE COMMUNITY — APOSTILA INTERATIVA
+   Design: páginas de PDF com sidebar de navegação
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+  /* Sidebar — dark */
+  --sb-bg:      #0e1117;
+  --sb-bg2:     #131820;
+  --sb-border:  #1e2535;
+  --sb-accent:  #00c9a0;
+  --sb-accent2: #0090f0;
+  --sb-text:    #c8d4e8;
+  --sb-text2:   #7888a8;
+  --sb-text3:   #4a5878;
+
+  /* Paper — cream/ivory page */
+  --paper:        #ffffff;
+  --paper-alt:    #f7f7f7;
+  --paper-dark:   #ebebeb;
+  --paper-border: #d5d5d5;
+  --ink:          #111111;
+  --ink2:         #2a2a2a;
+  --ink3:         #444444;
+  --ink4:         #777777;
+
+  /* Accents on paper */
+  --green:      #1a7a58;
+  --green-bg:   #e8f5f0;
+  --green-border:#b0d8c8;
+  --blue:       #1a5a8a;
+  --blue-bg:    #e8f0f8;
+  --blue-border:#b0c8e0;
+  --orange:     #b84820;
+  --orange-bg:  #fdf0e8;
+  --orange-border:#e0b898;
+  --red:        #8a1a1a;
+  --red-bg:     #faf0f0;
+  --red-border: #d0a0a0;
+  --amber:      #8a5a10;
+  --amber-bg:   #fdf5e0;
+  --amber-border:#d8c080;
+
+  /* Typography */
+  --serif:  'Playfair Display', Georgia, 'Times New Roman', serif;
+  --body:   'Source Serif 4', Georgia, serif;
+  --mono:   'JetBrains Mono', 'Consolas', monospace;
+
+  /* Page geometry */
+  --page-w:     820px;
+  --page-pad-x: 72px;
+  --page-pad-y: 60px;
+  --sidebar-w:  268px;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: #1e2128;
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16.5px;
+  line-height: 1.8;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── LAYOUT ───────────────────────────────────────────── */
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ─── SIDEBAR ──────────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  background: var(--sb-bg);
+  border-right: 1px solid var(--sb-border);
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar::-webkit-scrollbar { width: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: #2a3550; border-radius: 2px; }
+
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 28px 100px;
+}
+
+/* ─── SIDEBAR LOGO ─────────────────────────────────────── */
+.logo-area {
+  padding: 24px 18px 16px;
+  border-bottom: 1px solid var(--sb-border);
+}
+.logo-brand {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--sb-accent);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo-brand::before {
+  content: '';
+  display: inline-block;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--sb-accent);
+  box-shadow: 0 0 8px var(--sb-accent);
+  animation: pulse 2.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.logo-title {
+  font-family: var(--sb-sans, sans-serif);
+  font-weight: 600;
+  font-size: 13.5px;
+  color: var(--sb-text);
+  line-height: 1.4;
+}
+@keyframes pulse {
+  0%,100% { opacity:1; }
+  50%      { opacity:0.35; }
+}
+
+/* ─── PROGRESS ─────────────────────────────────────────── */
+.progress-area {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--sb-border);
+}
+.progress-label {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--sb-text3);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+.progress-label span { color: var(--sb-accent); font-weight: 600; }
+.progress-bar {
+  height: 2px;
+  background: #1e2535;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sb-accent) 0%, var(--sb-accent2) 100%);
+  border-radius: 2px;
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ─── NAV ──────────────────────────────────────────────── */
+.nav-chapters { padding: 6px 0; flex: 1; }
+
+.nav-ch-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-left: 2px solid transparent;
+}
+.nav-ch-item:hover:not(.locked) { background: rgba(255,255,255,0.04); }
+.nav-ch-item.active {
+  background: rgba(0,201,160,0.07);
+  border-left-color: var(--sb-accent);
+}
+.nav-ch-item.locked { opacity: 0.35; cursor: not-allowed; }
+
+.ch-icon {
+  width: 24px; height: 24px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-family: var(--mono);
+  font-weight: 700;
+  background: #1a2235;
+  color: var(--sb-text3);
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.nav-ch-item.active .ch-icon {
+  background: var(--sb-accent);
+  color: #0e1117;
+  box-shadow: 0 0 10px rgba(0,201,160,0.3);
+}
+.nav-ch-item.done .ch-icon {
+  background: rgba(0,201,160,0.12);
+  color: var(--sb-accent);
+}
+
+.ch-info { flex: 1; min-width: 0; }
+.ch-num {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--sb-text3);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.ch-name {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--sb-text2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.35;
+}
+.nav-ch-item.active .ch-name { color: var(--sb-text); }
+.ch-lock { font-size: 9px; color: var(--sb-text3); opacity: 0.6; }
+
+/* ─── SIDEBAR FOOTER ───────────────────────────────────── */
+.sidebar-footer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--sb-border);
+}
+.ethics-badge {
+  background: rgba(138,90,16,0.12);
+  border: 1px solid rgba(138,90,16,0.25);
+  border-radius: 5px;
+  padding: 8px 10px;
+  font-size: 10px;
+  color: rgba(200,160,80,0.85);
+  line-height: 1.55;
+}
+.ethics-badge strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+/* ─── SAVE NOTICE ──────────────────────────────────────── */
+.save-notice {
+  margin: 10px 14px 0;
+  padding: 10px 12px;
+  border-radius: 5px;
+  border: 1px solid rgba(0,144,240,0.2);
+  background: rgba(0,144,240,0.06);
+  font-size: 10.5px;
+  color: var(--sb-text2);
+  line-height: 1.55;
+}
+.save-notice strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--sb-accent2);
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.save-notice button { margin-top: 8px; width: 100%; justify-content: center; }
+.save-notice.ok {
+  border-color: rgba(0,201,160,0.22);
+  background: rgba(0,201,160,0.05);
+}
+
+/* ─── PAGE HEADER (sticky bar) ─────────────────────────── */
+.page-header {
+  width: 100%;
+  max-width: calc(var(--page-w) + 48px);
+  background: rgba(208,206,200,0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(0,0,0,0.12);
+  padding: 11px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0;
+  border-radius: 0;
+}
+.header-title {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--ink2);
+  letter-spacing: 0.3px;
+}
+.header-sub {
+  font-size: 10.5px;
+  color: var(--ink4);
+  font-family: var(--mono);
+  margin-top: 1px;
+  letter-spacing: 0.3px;
+}
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10.5px;
+  font-family: var(--mono);
+  color: var(--ink4);
+}
+.status-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse 2.5s ease-in-out infinite;
+}
+
+/* ─── RESTORE BANNER ───────────────────────────────────── */
+.restore-banner {
+  display: none;
+  width: 100%;
+  max-width: var(--page-w);
+  margin: 12px 0 0;
+  padding: 10px 16px;
+  border-radius: 5px;
+  font-size: 11.5px;
+  line-height: 1.6;
+  background: rgba(26,122,88,0.08);
+  border: 1px solid rgba(26,122,88,0.2);
+  color: var(--ink3);
+}
+.restore-banner.show { display: block; }
+.restore-banner strong { color: var(--green); }
+
+/* ═══════════════════════════════════════════════════════════
+   THE PDF PAGE
+   ═══════════════════════════════════════════════════════════ */
+.chapter-view { display: none; }
+.chapter-view.active { display: block; width: 100%; }
+
+/* The "sheet of paper" wrapper */
+.pdf-page {
+  width: var(--page-w);
+  max-width: 100%;
+  background: var(--paper);
+  border: 1px solid var(--paper-border);
+  border-radius: 2px;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.25),
+    0 8px 24px rgba(0,0,0,0.2),
+    0 24px 56px rgba(0,0,0,0.15);
+  margin: 24px auto 0;
+  position: relative;
+  overflow: hidden;
+}
+.pdf-page::before {
+  /* subtle page texture */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Page inner header — chapter title bar */
+.pdf-page-header {
+  background: var(--ink);
+  padding: 18px var(--page-pad-x) 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+.pdf-page-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.pdf-brand {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--sb-accent);
+}
+.pdf-chapter-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: rgba(200,212,232,0.65);
+  letter-spacing: 0.5px;
+}
+.pdf-chapter-title {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: #e8ecf4;
+  letter-spacing: -0.2px;
+  line-height: 1.3;
+}
+.pdf-page-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: rgba(200,212,232,0.4);
+}
+
+/* Page body */
+.pdf-page-body {
+  padding: var(--page-pad-y) var(--page-pad-x);
+  position: relative;
+  z-index: 1;
+}
+
+/* Page footer */
+.pdf-page-footer {
+  border-top: 1px solid var(--paper-dark);
+  padding: 14px var(--page-pad-x);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--paper-alt);
+  position: relative;
+  z-index: 1;
+}
+.pdf-footer-brand {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--ink3);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.pdf-footer-info {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--ink3);
+}
+
+/* ─── TYPOGRAPHY (on paper) ────────────────────────────── */
+h1 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--ink);
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+h2 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 19px;
+  color: var(--ink);
+  margin: 40px 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  letter-spacing: -0.2px;
+  line-height: 1.3;
+}
+h2::before {
+  content: '';
+  display: block;
+  width: 3px; height: 20px;
+  background: var(--green);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+h3 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink2);
+  margin: 26px 0 10px;
+  font-style: italic;
+}
+
+p {
+  color: var(--ink2);
+  margin-bottom: 14px;
+  font-size: 16px;
+  line-height: 1.82;
+}
+strong { color: var(--ink); font-weight: 600; }
+em { color: var(--ink2); font-style: italic; }
+code {
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--paper-dark);
+  border: 1px solid var(--paper-border);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--green);
+}
+
+/* ─── CHAPTER TAG ──────────────────────────────────────── */
+.chapter-tag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--green);
+  background: var(--green-bg);
+  border: 1px solid var(--green-border);
+  padding: 3px 10px;
+  border-radius: 3px;
+  margin-bottom: 12px;
+}
+
+/* ─── CHAPTER INTRO ────────────────────────────────────── */
+.ch-intro {
+  background: var(--paper-alt);
+  border: 1px solid var(--paper-border);
+  border-left: 3px solid var(--green);
+  padding: 16px 20px;
+  margin: 18px 0 30px;
+  color: var(--ink3);
+  font-size: 14.5px;
+  line-height: 1.8;
+  font-style: italic;
+  border-radius: 0 3px 3px 0;
+}
+
+/* ─── CARDS ────────────────────────────────────────────── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin: 18px 0;
+}
+.card {
+  background: var(--paper);
+  border: 1px solid var(--paper-border);
+  border-radius: 4px;
+  padding: 16px 18px;
+  transition: box-shadow 0.18s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.card:hover {
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+.card-icon { font-size: 18px; margin-bottom: 8px; }
+.card-title {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+  margin-bottom: 5px;
+}
+.card-text { font-size: 12.5px; color: var(--ink4); line-height: 1.65; }
+
+.splitter { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
+@media (max-width: 700px) { .splitter { grid-template-columns: 1fr; } }
+
+/* ─── BULLET LIST ──────────────────────────────────────── */
+.bullet-list { list-style: none; margin: 12px 0; }
+.bullet-list li {
+  display: flex;
+  gap: 10px;
+  padding: 7px 0;
+  color: var(--ink2);
+  font-size: 14px;
+  border-bottom: 1px solid var(--paper-dark);
+  line-height: 1.7;
+}
+.bullet-list li:last-child { border-bottom: none; }
+.bullet-list li::before {
+  content: '→';
+  color: var(--green);
+  font-family: var(--mono);
+  font-size: 11px;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+/* ─── CODE BLOCKS ──────────────────────────────────────── */
+.code-block {
+  background: #1a1c22;
+  border: 1px solid #2a2e3a;
+  border-radius: 4px;
+  padding: 14px 18px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: #a0c8a0;
+  margin: 16px 0;
+  overflow-x: auto;
+  line-height: 1.85;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15) inset;
+}
+.code-block .kw  { color: #7090d0; }
+.code-block .val { color: #d09060; }
+.code-block .cmt { color: #606878; font-style: italic; }
+.code-block .hdr { color: #a070d0; }
+
+/* ─── CALLOUTS ─────────────────────────────────────────── */
+.callout {
+  border-radius: 3px;
+  padding: 13px 16px;
+  margin: 18px 0;
+  font-size: 13.5px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.callout-icon { font-size: 15px; flex-shrink: 0; margin-top: 2px; }
+.callout-body { flex: 1; color: var(--ink3); line-height: 1.68; }
+.callout-body strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-weight: 700;
+}
+.callout.tip    { background: var(--green-bg);  border: 1px solid var(--green-border); }
+.callout.tip    .callout-icon { color: var(--green); }
+.callout.tip    .callout-body strong { color: var(--green); }
+
+.callout.warn   { background: var(--amber-bg);  border: 1px solid var(--amber-border); }
+.callout.warn   .callout-icon { color: var(--amber); }
+.callout.warn   .callout-body strong { color: var(--amber); }
+
+.callout.danger { background: var(--red-bg);    border: 1px solid var(--red-border); }
+.callout.danger .callout-icon { color: var(--red); }
+.callout.danger .callout-body strong { color: var(--red); }
+
+.callout.info   { background: var(--blue-bg);   border: 1px solid var(--blue-border); }
+.callout.info   .callout-icon { color: var(--blue); }
+.callout.info   .callout-body strong { color: var(--blue); }
+
+/* ─── FLOW DIAGRAM ─────────────────────────────────────── */
+.flow-diagram {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 18px 0;
+  background: var(--paper-alt);
+  border: 1px solid var(--paper-border);
+  border-radius: 4px;
+  padding: 16px 18px;
+}
+.flow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  min-width: 70px;
+}
+.flow-box {
+  background: var(--paper);
+  border: 1px solid var(--paper-border);
+  border-radius: 3px;
+  padding: 7px 11px;
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--ink2);
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.flow-box.accent {
+  border-color: var(--green-border);
+  color: var(--green);
+  background: var(--green-bg);
+}
+.flow-label { font-size: 9px; color: var(--ink4); margin-top: 5px; font-family: var(--mono); }
+.flow-arrow { color: var(--ink4); font-size: 14px; padding: 0 4px; align-self: center; }
+
+/* ─── SECTION DIVIDER ──────────────────────────────────── */
+.section-divider {
+  border: none;
+  border-top: 1px solid var(--paper-dark);
+  margin: 36px 0;
+}
+
+/* ─── LAB SECTION ──────────────────────────────────────── */
+.lab-section {
+  margin: 36px 0;
+  background: var(--paper);
+  border: 1px solid var(--paper-border);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.lab-header {
+  background: var(--ink);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.lab-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 12px;
+  color: #e8ecf4;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.lab-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  background: rgba(0,144,240,0.2);
+  color: #70b8f8;
+  border: 1px solid rgba(0,144,240,0.3);
+  padding: 2px 7px;
+  border-radius: 3px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.lab-status {
+  font-size: 10px;
+  font-family: var(--mono);
+  color: rgba(200,210,230,0.5);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.lab-status.complete { color: var(--sb-accent); }
+.lab-body { padding: 20px 22px; }
+.lab-desc {
+  font-size: 13px;
+  color: var(--ink2);
+  margin-bottom: 16px;
+  line-height: 1.72;
+}
+
+/* ─── BURP PANELS ──────────────────────────────────────── */
+.burp-panel {
+  background: #12151c;
+  border: 1px solid #252a3a;
+  border-radius: 3px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.burp-panel-tabs {
+  display: flex;
+  background: #0e1117;
+  border-bottom: 1px solid #252a3a;
+}
+.burp-tab {
+  padding: 6px 13px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: #5a6880;
+  cursor: pointer;
+  border-right: 1px solid #252a3a;
+  transition: color 0.15s, background 0.15s;
+}
+.burp-tab.active { color: var(--sb-accent); background: #1a1f2e; }
+
+.burp-panel-content {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: #8a98b8;
+  padding: 13px 15px;
+  min-height: 100px;
+  white-space: pre;
+  overflow-x: auto;
+  line-height: 1.85;
+}
+.burp-editable { outline: none; white-space: pre; }
+
+.http-method      { color: #5ab4f0; font-weight: 700; }
+.http-path        { color: #d09060; }
+.http-version     { color: #5a6880; }
+.http-host        { color: #50c0a0; }
+.http-header-name { color: #a070d0; }
+.http-value       { color: #8a98b8; }
+.http-body-param  { color: #d0a840; }
+.http-200         { color: #50c0a0; font-weight: 700; }
+.http-403         { color: #e06060; font-weight: 700; }
+
+/* ─── LAB CONTROLS ─────────────────────────────────────── */
+.lab-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+/* ─── BUTTONS ──────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.16s;
+  font-family: var(--mono);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-primary {
+  background: var(--green);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: #218a65;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(26,122,88,0.3);
+}
+.btn-secondary {
+  background: var(--paper-dark);
+  color: var(--ink2);
+  border: 1px solid var(--paper-border);
+}
+.btn-secondary:hover:not(:disabled) { background: var(--paper-alt); }
+.btn-danger {
+  background: var(--red-bg);
+  color: var(--red);
+  border: 1px solid var(--red-border);
+}
+.btn-accent2 {
+  background: var(--blue-bg);
+  color: var(--blue);
+  border: 1px solid var(--blue-border);
+}
+.btn-accent2:hover:not(:disabled) { background: #dce8f5; }
+
+/* ─── LAB FEEDBACK ─────────────────────────────────────── */
+.lab-feedback {
+  margin-top: 12px;
+  padding: 11px 14px;
+  border-radius: 3px;
+  font-size: 12.5px;
+  line-height: 1.65;
+  display: none;
+  font-family: var(--body);
+}
+.lab-feedback.show { display: block; }
+.lab-feedback.success { background: var(--green-bg); border: 1px solid var(--green-border); color: var(--ink3); }
+.lab-feedback.fail    { background: var(--red-bg);   border: 1px solid var(--red-border);   color: var(--ink3); }
+.lab-feedback strong { color: var(--green); }
+
+/* ─── QUESTIONS ────────────────────────────────────────── */
+.questions-section { margin: 36px 0; }
+.questions-header {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--ink);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.questions-header::before {
+  content: '';
+  display: block;
+  width: 3px; height: 20px;
+  background: var(--blue);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.questions-sub { font-size: 12.5px; color: var(--ink3); margin-bottom: 16px; font-family: var(--mono); }
+
+.question-card {
+  background: var(--paper);
+  border: 1px solid var(--paper-border);
+  border-radius: 3px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: border-color 0.15s;
+}
+.question-card.answered-correct { border-color: var(--green-border); }
+.question-card.answered-wrong   { border-color: var(--red-border); }
+
+.q-header {
+  padding: 12px 16px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--paper-dark);
+  background: #efefef;
+}
+.q-num {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--blue);
+  background: var(--blue-bg);
+  border: 1px solid var(--blue-border);
+  padding: 2px 7px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.q-text { font-size: 13.5px; color: var(--ink); line-height: 1.65; }
+
+.q-options { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+
+.q-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 13px;
+  background: #f5f5f5;
+  border: 1px solid #d0d0d0;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.14s;
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.55;
+}
+.q-option:hover:not(.disabled) {
+  border-color: var(--blue-border);
+  background: var(--blue-bg);
+}
+.q-option.selected  { border-color: var(--blue-border); background: var(--blue-bg); color: var(--ink); }
+.q-option.correct   { border-color: var(--green-border); background: var(--green-bg); color: var(--ink); }
+.q-option.wrong     { border-color: var(--red-border); background: var(--red-bg); }
+.q-option.disabled  { cursor: default; }
+
+.q-letter {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--ink3);
+  flex-shrink: 0;
+  width: 16px;
+}
+.q-option.selected .q-letter { color: var(--blue); }
+.q-option.correct  .q-letter { color: var(--green); }
+.q-option.wrong    .q-letter { color: var(--red); }
+
+.q-feedback {
+  padding: 12px 16px;
+  border-top: 1px solid var(--paper-dark);
+  display: none;
+  background: #f0f0f0;
+}
+.q-feedback.show { display: block; }
+.q-feedback-result {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 8px;
+}
+.q-feedback-result.correct { color: var(--green); }
+.q-feedback-result.wrong   { color: var(--red); }
+.q-feedback-exp { font-size: 12.5px; color: var(--ink2); line-height: 1.72; }
+.q-feedback-exp strong { color: var(--ink); }
+.q-feedback-exp .why-wrong { margin-top: 8px; color: var(--ink4); }
+.q-feedback-exp .why-wrong li { margin: 4px 0; }
+.q-feedback-exp .why-wrong strong { color: var(--ink3); }
+
+/* ─── CHAPTER FOOTER (nav) ─────────────────────────────── */
+.chapter-footer {
+  margin-top: 0;
+  padding: 14px var(--page-pad-x);
+  border-top: 1px solid var(--paper-dark);
+  background: var(--paper-alt);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.chapter-score { font-family: var(--mono); font-size: 11.5px; color: var(--ink2); }
+.chapter-score span { color: var(--green); font-weight: 700; }
+
+/* ─── COMPLETION SCREEN ────────────────────────────────── */
+#completion-view {
+  display: none;
+  width: var(--page-w);
+  max-width: 100%;
+  background: var(--paper);
+  border: 1px solid var(--paper-border);
+  border-radius: 2px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12), 0 12px 40px rgba(0,0,0,0.08);
+  margin: 24px auto 0;
+}
+#completion-view.active { display: block; }
+
+.completion-inner {
+  padding: 60px var(--page-pad-x);
+  text-align: center;
+}
+.completion-badge {
+  width: 70px; height: 70px;
+  background: var(--ink);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 22px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+.completion-title {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 30px;
+  color: var(--ink);
+  margin-bottom: 10px;
+  letter-spacing: -0.3px;
+}
+.completion-sub { font-size: 15px; color: var(--ink3); margin-bottom: 28px; max-width: 440px; margin-left: auto; margin-right: auto; line-height: 1.72; }
+
+.cert-form {
+  background: var(--paper-alt);
+  border: 1px solid var(--paper-border);
+  border-radius: 4px;
+  padding: 24px;
+  max-width: 400px;
+  width: 100%;
+  margin: 0 auto 20px;
+  text-align: left;
+}
+.cert-form label {
+  display: block;
+  font-size: 9.5px;
+  font-family: var(--mono);
+  color: var(--ink4);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 7px;
+}
+.cert-form input {
+  width: 100%;
+  background: var(--paper);
+  border: 1px solid var(--paper-border);
+  border-radius: 3px;
+  padding: 10px 13px;
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s;
+  margin-bottom: 13px;
+}
+.cert-form input:focus { border-color: var(--green); }
+.cert-form input::placeholder { color: var(--ink4); }
+
+/* ─── LOCKED OVERLAY ───────────────────────────────────── */
+.locked-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  text-align: center;
+  gap: 12px;
+  padding: var(--page-pad-y) var(--page-pad-x);
+}
+.locked-icon { font-size: 40px; opacity: 0.2; }
+.locked-title { font-family: var(--serif); font-weight: 700; font-size: 18px; color: var(--ink4); }
+.locked-sub { font-size: 13.5px; color: var(--ink4); max-width: 320px; line-height: 1.7; }
+
+/* ─── READ GATE ────────────────────────────────────────── */
+.read-gate {
+  margin: 24px 0 30px;
+  padding: 14px 16px;
+  border-radius: 3px;
+  background: var(--blue-bg);
+  border: 1px solid var(--blue-border);
+}
+.read-gate.done { background: var(--green-bg); border-color: var(--green-border); }
+.read-gate-title { font-family: var(--serif); font-weight: 700; font-size: 13px; color: var(--ink); margin-bottom: 4px; }
+.read-gate-sub { font-size: 12px; color: var(--ink4); margin-bottom: 10px; line-height: 1.65; font-family: var(--mono); }
+.read-check { display: flex; gap: 9px; align-items: flex-start; font-size: 12.5px; color: var(--ink2); margin-bottom: 10px; }
+.read-check input { accent-color: var(--green); margin-top: 3px; }
+
+/* ─── SCORE BAR ────────────────────────────────────────── */
+.questions-actions {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  background: var(--paper-alt);
+  border: 1px solid var(--paper-border);
+  border-radius: 3px;
+}
+.questions-actions-meta {
+  font-size: 12px;
+  color: var(--ink3);
+  font-family: var(--mono);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.score-bar {
+  background: var(--paper-alt);
+  border: 1px solid var(--paper-border);
+  border-radius: 3px;
+  padding: 12px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 16px 0;
+  font-size: 12px;
+}
+.score-bar .score-val { font-family: var(--mono); font-weight: 700; font-size: 20px; color: var(--green); }
+.score-bar .score-label { color: var(--ink3); font-size: 10.5px; margin-top: 1px; font-family: var(--mono); }
+.score-bar .score-min { font-size: 11px; color: var(--ink3); font-family: var(--mono); }
+.score-bar .score-min span { color: var(--amber); }
+
+/* ─── CHAPTER COMPLETE BANNER ──────────────────────────── */
+.ch-complete-banner {
+  background: var(--green-bg);
+  border: 1px solid var(--green-border);
+  border-radius: 3px;
+  padding: 14px 18px;
+  margin: 20px 0;
+  display: none;
+  align-items: center;
+  gap: 12px;
+}
+.ch-complete-banner.show { display: flex; }
+.ch-complete-banner .banner-icon { font-size: 22px; }
+.ch-complete-banner .banner-text { flex: 1; }
+.ch-complete-banner .banner-title { font-family: var(--serif); font-weight: 700; font-size: 14px; color: var(--green); margin-bottom: 2px; }
+.ch-complete-banner .banner-sub { font-size: 12px; color: var(--ink4); font-family: var(--mono); }
+
+/* ─── HTTP TABLE ───────────────────────────────────────── */
+table.http-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  margin: 12px 0;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid var(--paper-border);
+}
+table.http-table th {
+  background: var(--ink);
+  color: rgba(200,212,232,0.7);
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding: 8px 12px;
+  text-align: left;
+}
+table.http-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--paper-dark);
+  color: var(--ink2);
+}
+table.http-table tr:last-child td { border-bottom: none; }
+table.http-table tr:nth-child(even) td { background: var(--paper-alt); }
+table.http-table .td-key   { color: var(--blue); }
+table.http-table .td-val   { color: var(--ink); }
+table.http-table .risk-high { color: var(--red); font-weight: 700; }
+table.http-table .risk-med  { color: var(--amber); }
+table.http-table .risk-low  { color: var(--green); }
+
+/* ─── RESPONSE BOX ─────────────────────────────────────── */
+.response-box {
+  background: #12151c;
+  border: 1px solid #252a3a;
+  border-radius: 3px;
+  padding: 13px 15px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  white-space: pre;
+  overflow-x: auto;
+  color: #8a98b8;
+  line-height: 1.85;
+  margin: 10px 0;
+}
+
+/* ─── FORM INPUTS ──────────────────────────────────────── */
+.select-input {
+  background: var(--paper-alt);
+  border: 1px solid var(--paper-border);
+  border-radius: 3px;
+  padding: 8px 12px;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.14s;
+}
+.select-input:focus { border-color: var(--green); }
+.select-input option { background: var(--paper); }
+
+.text-input {
+  background: var(--paper-alt);
+  border: 1px solid var(--paper-border);
+  border-radius: 3px;
+  padding: 8px 12px;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.14s;
+}
+.text-input:focus { border-color: var(--green); }
+
+/* ─── TAGS ─────────────────────────────────────────────── */
+.tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+.tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  color: var(--ink4);
+  background: var(--paper-dark);
+  border: 1px solid var(--paper-border);
+}
+.tag.acc    { color: var(--green); border-color: var(--green-border); background: var(--green-bg); }
+.tag.acc2   { color: var(--blue);  border-color: var(--blue-border);  background: var(--blue-bg); }
+.tag.warn   { color: var(--amber); border-color: var(--amber-border); background: var(--amber-bg); }
+.tag.danger { color: var(--red);   border-color: var(--red-border);   background: var(--red-bg); }
+
+/* ─── MOBILE MENU ──────────────────────────────────────── */
+.mobile-menu-btn {
+  display: none;
+  background: var(--paper-dark);
+  border: 1px solid var(--paper-border);
+  border-radius: 3px;
+  padding: 6px 8px;
+  cursor: pointer;
+  color: var(--ink2);
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* ─── CERT CANVAS ──────────────────────────────────────── */
+#cert-canvas { display: none; }
+
+/* ─── CANVAS CERT ──────────────────────────────────────── */
+.completion-inner { padding: 48px var(--page-pad-x); }
+
+/* ─── RESPONSIVE ───────────────────────────────────────── */
+@media (max-width: 960px) {
+  .sidebar { transform: translateX(calc(-1 * var(--sidebar-w))); transition: transform 0.3s ease; }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .page-header { max-width: 100%; }
+  .pdf-page { width: calc(100vw - 48px); }
+  #completion-view { width: calc(100vw - 48px); }
+  .mobile-menu-btn { display: flex !important; }
+}
+
+@media (max-width: 640px) {
+  :root { --page-pad-x: 22px; --page-pad-y: 32px; }
+  .main { padding: 20px 12px 60px; }
+  .pdf-page { width: calc(100vw - 24px); }
+  h1 { font-size: 22px; }
+  h2 { font-size: 16px; }
+  .chapter-footer { flex-direction: column; padding: 12px 22px; }
+  .btn { width: 100%; justify-content: center; }
+  .lab-controls { flex-direction: column; }
+  .completion-inner { padding: 32px 22px; }
+  .completion-title { font-size: 24px; }
+}
+
+.q-option > div:last-child { min-height: 34px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="logo-area">
+      <div class="logo-brand">Be Safe</div>
+      <div class="logo-title">Mini Curso<br>Burp Suite Community</div>
+    </div>
+    <div class="progress-area">
+      <div class="progress-label">Progresso <span id="progress-pct">0%</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="save-notice" id="save-notice-box">
+      <strong>Salvar progresso</strong>
+      O progresso pode ser salvo somente neste navegador, em armazenamento local. Isso ocorre quando você habilita o salvamento abaixo e continua respondendo questões, concluindo labs, validando leitura e trocando de capítulo. Ao limpar cache/dados do site, usar modo anônimo ou trocar de navegador/dispositivo, o avanço pode sumir.
+      <button class="btn btn-accent2" id="save-notice-btn" onclick="acceptSaveNotice()">Entendi e quero salvar aqui</button>
+    </div>
+    <nav class="nav-chapters" id="nav-chapters">
+      <!-- injected by JS -->
+    </nav>
+    <div class="sidebar-footer">
+      <div class="ethics-badge">
+        <strong>⚠ Ética e Autorização</strong>
+        Use apenas em ambientes autorizados. Testes sem permissão são ilegais.
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <header class="page-header">
+      <div>
+        <div class="header-title" id="header-title">Carregando...</div>
+        <div class="header-sub" id="header-sub">Mini Curso de Burp Suite Community</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="header-status">
+          <div class="status-dot"></div>
+          <span id="header-status-text">Offline Ready</span>
+        </div>
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+      </div>
+    </header>
+
+    <div id="restore-banner" class="restore-banner" style="display:none"></div>
+    <!-- CHAPTERS injected -->
+    <div id="chapter-views"></div>
+    <div id="completion-view" class="chapter-view">
+      <!-- completion screen injected -->
+    </div>
+  </main>
+</div>
+
+<canvas id="cert-canvas" width="1056" height="816"></canvas>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// BLINDAGEM DE GABARITO — índices mascarados + ordem embaralhada
+// Não expõe letras corretas nem mantém A/B/C/D fixo por questão.
+// ═══════════════════════════════════════════════════════════
+const _M = ['L2N6T3','K5P1R4','V7C9X8','J0H4W2','Z3B8Q6','N1F5Y7'];
+const _SALT = 'bs26_lock';
+
+function _gx(cidx, qidx) {
+  const raw = _M[cidx].charCodeAt(qidx) ^ _SALT.charCodeAt((cidx + qidx) % _SALT.length);
+  return raw & 3;
+}
+
+function _seed(cidx, qidx) {
+  let s = 0;
+  const src = `${_M[cidx]}:${qidx}:${_SALT}`;
+  for (let i = 0; i < src.length; i++) s = (s * 131 + src.charCodeAt(i)) >>> 0;
+  return s || 1;
+}
+
+function _ord(cidx, qidx, total = 4) {
+  const arr = Array.from({ length: total }, (_, i) => i);
+  let s = _seed(cidx, qidx);
+  for (let i = arr.length - 1; i > 0; i--) {
+    s = (1664525 * s + 1013904223) >>> 0;
+    const j = s % (i + 1);
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function _dispLetter(cidx, qidx, originalIndex) {
+  if (originalIndex === undefined || originalIndex === null) return '';
+  const pos = _ord(cidx, qidx).indexOf(originalIndex);
+  return ['A','B','C','D'][pos] || '';
+}
+
+// ═══════════════════════════════════════════════════════════
+// COURSE DATA
+// ═══════════════════════════════════════════════════════════
+const CHAPTERS = [
+  {
+    id: 0,
+    title: 'Proxy, Intercept e o Fluxo do Burp',
+    tag: 'Capítulo 01 — Fundamentos',
+    hours: '~1h40',
+    minScore: 3,
+    content: buildCh1,
+    lab: buildLab1,
+    questions: buildQ1,
+  },
+  {
+    id: 1,
+    title: 'HTTP, HTTPS, Headers, Cookies e Sessão',
+    tag: 'Capítulo 02 — Protocolo e Identidade',
+    hours: '~2h',
+    minScore: 3,
+    content: buildCh2,
+    lab: buildLab2,
+    questions: buildQ2,
+  },
+  {
+    id: 2,
+    title: 'Repeater e Manipulação Manual de Requests',
+    tag: 'Capítulo 03 — Exploração Ativa',
+    hours: '~1h50',
+    minScore: 3,
+    content: buildCh3,
+    lab: buildLab3,
+    questions: buildQ3,
+  },
+  {
+    id: 3,
+    title: 'Superfície de Ataque, Parâmetros e Inputs',
+    tag: 'Capítulo 04 — Mapeamento',
+    hours: '~2h',
+    minScore: 3,
+    content: buildCh4,
+    lab: buildLab4,
+    questions: buildQ4,
+  },
+  {
+    id: 4,
+    title: 'Casos Reais: Falhas Comuns em Aplicações Web',
+    tag: 'Capítulo 05 — Prática Guiada',
+    hours: '~2h',
+    minScore: 3,
+    content: buildCh5,
+    lab: buildLab5,
+    questions: buildQ5,
+  },
+  {
+    id: 5,
+    title: 'Laboratório Final: Raciocínio Técnico Integrado',
+    tag: 'Capítulo 06 — Síntese',
+    hours: '~1h30',
+    minScore: 4,
+    content: buildCh6,
+    lab: buildLab6,
+    questions: buildQ6,
+  },
+];
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let state = {
+  chapters: CHAPTERS.map(() => ({
+    unlocked: false,
+    contentRead: false,
+    labDone: false,
+    score: 0,
+    answers: [],
+    complete: false,
+  })),
+  currentChapter: 0,
+  consent: false,
+};
+state.chapters[0].unlocked = true;
+
+const STORAGE_KEY = 'bsq_progress_v2';
+let restoredFromStorage = false;
+
+function saveState() {
+  if (!state.consent) return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.warn('Falha ao salvar progresso:', e);
+  }
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('bsq_2026');
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (s && s.chapters && s.chapters.length === CHAPTERS.length) {
+      state = {...state, ...s};
+      if (typeof state.consent !== 'boolean') state.consent = true;
+      restoredFromStorage = true;
+    }
+  } catch(e) {
+    console.warn('Falha ao carregar progresso:', e);
+  }
+}
+function isAllComplete() {
+  return state.chapters.every(c => c.complete);
+}
+function getProgress() {
+  const done = state.chapters.filter(c => c.complete).length;
+  return Math.round((done / CHAPTERS.length) * 100);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHAPTER CONTENT BUILDERS
+// ═══════════════════════════════════════════════════════════
+
+function buildCh1() {
+  return `
+<div class="chapter-tag">Capítulo 01 — Fundamentos</div>
+<h1>Proxy, Intercept e o Fluxo do Burp</h1>
+<p style="color:var(--text3);font-family:var(--mono);font-size:13px;">Carga horária estimada: ~1h40 | Versão: Burp Suite Community 2025.x / 2026</p>
+
+<div class="ch-intro">
+  O Burp Suite é a ferramenta padrão de mercado para análise de segurança em aplicações web. A edição Community é gratuita e funcional para análise manual — sem scanner automático, sem intruder irrestrito e sem salvar projeto nativamente. Traduzindo: ela tira a rodinha da bicicleta. Se você só acha falha quando o scanner aponta com o dedo, o problema não é a licença.
+</div>
+
+<h2>O que é o Burp Suite Community?</h2>
+<p>É um proxy HTTP/HTTPS interativo que posiciona o analista entre o navegador e o servidor. Tudo que trafega por esse meio pode ser inspecionado, modificado, repetido e analisado. A versão Community é limitada em automação, mas a análise manual continua sendo a forma mais eficaz de encontrar falhas de lógica de negócios, controle de acesso e autenticação defeituosa. Em outras palavras: quando a ferramenta para de te mimar, o cérebro finalmente entra no loop.</p>
+
+<div class="card-grid">
+  <div class="card"><div class="card-icon">🔀</div><div class="card-title">Proxy</div><div class="card-text">Captura e intercepta tráfego entre browser e servidor. Tudo passa por aqui. É onde a festa começa.</div></div>
+  <div class="card"><div class="card-icon">🔁</div><div class="card-title">Repeater</div><div class="card-text">Reenvia requests manualmente com modificações. Seu laboratório pessoal de tentativa e erro.</div></div>
+  <div class="card"><div class="card-icon">🌐</div><div class="card-title">Target / Site Map</div><div class="card-text">Organiza endpoints visitados. Na Community, é preenchido passivamente conforme você navega.</div></div>
+  <div class="card"><div class="card-icon">🧰</div><div class="card-title">Decoder / Comparer</div><div class="card-text">Codificação e comparação de payloads. Simples, mas essenciais para análise manual precisa.</div></div>
+</div>
+
+<h2>O Fluxo Padrão de Trabalho</h2>
+<p>Antes de qualquer teste, você precisa entender o fluxo completo. Não adianta usar o Repeater sem ter capturado o request no Proxy. A ordem importa — e ignorá-la vai te fazer perder horas procurando um bug que já estava na sua tela, olhando para você com desprezo técnico.</p>
+
+<div class="flow-diagram">
+  <div class="flow-step"><div class="flow-box accent">Browser</div><div class="flow-label">FoxyProxy ativo</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-box">Burp Proxy<br>127.0.0.1:8080</div><div class="flow-label">Intercepta</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-box">Intercept ON</div><div class="flow-label">Analisa / edita</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-box">Forward</div><div class="flow-label">Envia ao servidor</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-box accent">Response</div><div class="flow-label">Analisa retorno</div></div>
+</div>
+
+<h2>Configuração Básica — sem pular etapa</h2>
+<ul class="bullet-list">
+  <li><strong>Instale o Burp CA Certificate</strong> — sem isso, HTTPS vai dar erro e você vai achar que o Burp está quebrado quando o problema é você.</li>
+  <li><strong>Configure o proxy do browser</strong> — 127.0.0.1 porta 8080. Use FoxyProxy para alternar rapidamente.</li>
+  <li><strong>Proxy → Options → Import / Export CA Certificate</strong> — exporte e instale no browser como autoridade confiável.</li>
+  <li><strong>Intercept ON/OFF</strong> — quando Intercept está ON, o Burp segura cada request. Deixar ON e esquecer = browser congelado = confusão desnecessária.</li>
+  <li><strong>HTTP History</strong> — aba onde tudo fica registrado mesmo com Intercept OFF. Seu maior aliado no mapeamento passivo.</li>
+</ul>
+
+<h2>Intercept ON vs. OFF — quando usar cada um</h2>
+<div class="splitter">
+  <div class="card">
+    <div class="card-title" style="color:var(--accent)">Intercept ON</div>
+    <div class="card-text">Use quando quiser editar um request específico antes do envio. Login, envio de formulário, ação sensível. Você controla o fluxo byte a byte.</div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="color:var(--accent2)">Intercept OFF</div>
+    <div class="card-text">Use para navegação passiva. O Burp registra tudo em HTTP History sem travar o browser. Ótimo para mapear endpoints sem interferir na sessão.</div>
+  </div>
+</div>
+
+<h2>HTTP History — sua memória de curto prazo</h2>
+<p>Toda requisição passa pelo HTTP History independente do estado do Intercept. É ali que você vai revisar requests anteriores, procurar parâmetros interessantes e enviar pro Repeater com <strong>Ctrl+R</strong> (ou botão direito → Send to Repeater). Se você não usa o HTTP History, está perdendo metade do trabalho.</p>
+
+<div class="callout tip">
+  <div class="callout-icon">💡</div>
+  <div class="callout-body"><strong>Dica de Analista</strong>
+  Filtre o HTTP History por tipo de conteúdo. Requisições com <code>application/json</code> ou <code>application/x-www-form-urlencoded</code> costumam ser os pontos mais interessantes para manipulação. APIs retornando JSON são o alvo número um de análise de controle de acesso.</div>
+</div>
+
+<div class="callout warn">
+  <div class="callout-icon">⚠️</div>
+  <div class="callout-body"><strong>Erro Comum</strong>
+  Instalar o Burp, configurar o proxy, mas esquecer de instalar o certificado CA. Resultado: HTTPS falha, browser mostra erro SSL, analista perde 40 minutos achando que é bug do Burp. Não seja essa pessoa.</div>
+</div>
+
+<div class="callout danger">
+  <div class="callout-icon">🚫</div>
+  <div class="callout-body"><strong>Ética Obrigatória</strong>
+  Todo e qualquer teste demonstrado neste curso deve ser realizado apenas em ambientes autorizados: lab próprio, plataformas de CTF, programas de bug bounty com escopo definido ou contratos formais. Testar sem autorização é crime — e isso não é figura de linguagem.</div>
+</div>
+
+<h2>O que a Community NÃO tem (e por quê isso importa)</h2>
+<p>Conhecer as limitações da edição Community evita frustração e gerencia expectativas. Você não vai usar scanner automático. Você não vai ter Intruder sem throttle. Mas vai aprender a fazer análise manual — que, diga-se de passagem, encontra falhas que scanner nenhum acha.</p>
+
+<div class="tag-row">
+  <span class="tag danger">Sem scanner automático</span>
+  <span class="tag danger">Intruder com delay forçado</span>
+  <span class="tag danger">Sem salvar projeto</span>
+  <span class="tag danger">Sem colaboração</span>
+  <span class="tag acc">Proxy completo</span>
+  <span class="tag acc">Repeater ilimitado</span>
+  <span class="tag acc">Decoder / Comparer</span>
+  <span class="tag acc">HTTP History completo</span>
+</div>
+
+<h2>Target Scope — defina antes de começar</h2>
+<p>Em Target → Scope, você define quais hosts fazem parte do escopo de teste. Isso filtra o HTTP History e evita que requisições de terceiros (analytics, CDN, fontes externas) poluam sua análise. Definir escopo é profissionalismo básico — e em bug bounty, é obrigatório para não sair do programa.</p>
+`;
+}
+
+function buildLab1() {
+  return `
+<div class="lab-section" id="lab1">
+  <div class="lab-header">
+    <div class="lab-title">🔬 <span>Lab 1 — Intercept e Edição de Request</span> <span class="lab-badge">Interativo</span></div>
+    <div class="lab-status" id="lab1-status">⬜ Pendente</div>
+  </div>
+  <div class="lab-body">
+    <div class="lab-desc">
+      Você interceptou um login de um portal que passou recentemente por um rollout “moderno” com feature flag, tracing e proxy reverso. Traduzindo: colocaram ruído suficiente para parecer complexo. Sua tarefa é descobrir qual campo realmente influencia privilégio. Nem todo parâmetro com cara de autorização manda em alguma coisa. Edite o request e reencontre o ponto de decisão real.
+    </div>
+
+    <h3 style="color:var(--text3);font-size:12px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">REQUEST INTERCEPTADO (Editável)</h3>
+    <div class="burp-panel">
+      <div class="burp-panel-tabs">
+        <div class="burp-tab active">Raw</div>
+        <div class="burp-tab">Headers</div>
+        <div class="burp-tab">Params</div>
+      </div>
+      <div class="burp-panel-content" contenteditable="true" id="lab1-request" class="burp-editable" spellcheck="false"><span class="http-method">POST</span> <span class="http-path">/api/auth/login</span> <span class="http-version">HTTP/1.1</span>
+<span class="http-header-name">Host:</span> <span class="http-host">app.target.lab</span>
+<span class="http-header-name">X-Request-ID:</span> <span class="http-value">9f8a21c2</span>
+<span class="http-header-name">X-Feature-Flag:</span> <span class="http-value">new-auth-flow</span>
+<span class="http-header-name">X-Envoy-External-Address:</span> <span class="http-value">177.54.22.11</span>
+<span class="http-header-name">Content-Type:</span> <span class="http-value">application/x-www-form-urlencoded</span>
+<span class="http-header-name">Cookie:</span> <span class="http-value">session=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9</span>
+
+<span class="http-body-param">username=analista&amp;password=S3cur3Pass!&amp;role=user&amp;userRole=basic&amp;access_level=1&amp;beta=true</span></div>
+    </div>
+
+    <div class="lab-controls">
+      <button class="btn btn-primary" onclick="runLab1()">▶ Enviar Request Modificado</button>
+      <button class="btn btn-secondary" onclick="resetLab1()">↺ Resetar</button>
+    </div>
+
+    <h3 style="color:var(--text3);font-size:12px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">RESPONSE DO SERVIDOR</h3>
+    <div class="response-box" id="lab1-response">Aguardando envio...</div>
+
+    <div class="lab-feedback" id="lab1-feedback"></div>
+  </div>
+</div>
+`;
+}
+
+function buildLab2() {
+  return `
+<div class="lab-section" id="lab2">
+  <div class="lab-header">
+    <div class="lab-title">🔬 <span>Lab 2 — Cookie Inseguro e Controle de Sessão</span> <span class="lab-badge">Interativo</span></div>
+    <div class="lab-status" id="lab2-status">⬜ Pendente</div>
+  </div>
+  <div class="lab-body">
+    <div class="lab-desc">
+      Você interceptou um response de login. Analise os headers de Set-Cookie retornados e identifique qual flag de segurança está <strong>ausente</strong> no cookie de sessão. Selecione a resposta correta para concluir o lab.
+    </div>
+
+    <h3 style="color:var(--text3);font-size:12px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">RESPONSE INTERCEPTADO</h3>
+    <div class="response-box"><span class="http-200">HTTP/1.1 200 OK</span>
+<span class="http-header-name">Set-Cookie:</span> <span class="http-value">sessionId=4f3d2a1b8c9e; Path=/; Secure</span>
+<span class="http-header-name">Set-Cookie:</span> <span class="http-value">userRole=admin; Path=/</span>
+<span class="http-header-name">Content-Type:</span> <span class="http-value">application/json</span>
+<span class="http-header-name">X-Frame-Options:</span> <span class="http-value">SAMEORIGIN</span>
+
+<span class="http-value">{"status":"ok","user":"analista","role":"admin"}</span></div>
+
+    <h3 style="margin:16px 0 10px;">Qual problema de segurança você identifica neste response?</h3>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;background:var(--bg4);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text2);">
+        <input type="radio" name="lab2q" value="a" style="accent-color:var(--accent);"> O cookie sessionId não define SameSite, o que aumenta exposição a cenários cross-site
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;background:var(--bg4);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text2);">
+        <input type="radio" name="lab2q" value="b" style="accent-color:var(--accent);"> O cookie sessionId está sem HttpOnly, permitindo leitura por JavaScript em caso de XSS
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;background:var(--bg4);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text2);">
+        <input type="radio" name="lab2q" value="c" style="accent-color:var(--accent);"> O cookie userRole expõe o papel em texto claro e não tem HttpOnly nem Secure
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;background:var(--bg4);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text2);">
+        <input type="radio" name="lab2q" value="d" style="accent-color:var(--accent);"> O header X-Frame-Options em SAMEORIGIN reduz risco, mas não é a falha principal neste cenário
+      </label>
+    </div>
+
+    <div class="lab-controls" style="margin-top:16px;">
+      <button class="btn btn-primary" onclick="runLab2()">▶ Confirmar Análise</button>
+    </div>
+    <div class="lab-feedback" id="lab2-feedback"></div>
+  </div>
+</div>`;
+}
+
+function buildLab3() {
+  return `
+<div class="lab-section" id="lab3">
+  <div class="lab-header">
+    <div class="lab-title">🔬 <span>Lab 3 — Repeater: Verb Tampering</span> <span class="lab-badge">Interativo</span></div>
+    <div class="lab-status" id="lab3-status">⬜ Pendente</div>
+  </div>
+  <div class="lab-body">
+    <div class="lab-desc">
+      O endpoint <code>/api/admin/users/delete</code> retorna 403 para requisições POST não autorizadas. Você suspeita que a aplicação valida o método HTTP de forma inconsistente. Selecione o método alternativo que provavelmente bypassa a validação e explique a lógica.
+    </div>
+
+    <div class="burp-panel">
+      <div class="burp-panel-tabs"><div class="burp-tab active">Repeater — Request Original</div></div>
+      <div class="burp-panel-content"><span class="http-method">POST</span> <span class="http-path">/api/admin/users/delete</span> <span class="http-version">HTTP/1.1</span>
+<span class="http-header-name">Host:</span> <span class="http-host">app.target.lab</span>
+<span class="http-header-name">Authorization:</span> <span class="http-value">Bearer eyJ0eXAiOiJKV1QiLCJ1c2VyIjoidXNlciJ9</span>
+<span class="http-header-name">Content-Type:</span> <span class="http-value">application/json</span>
+
+<span class="http-body-param">{"userId": 42}</span></div>
+    </div>
+
+    <div class="response-box"><span class="http-403">HTTP/1.1 403 Forbidden</span>
+<span class="http-header-name">Content-Type:</span> <span class="http-value">application/json</span>
+
+<span class="http-value">{"error":"Access denied. Insufficient permissions."}</span></div>
+
+    <h3 style="margin:16px 0 10px;">Qual método você testa primeiro no Repeater?</h3>
+    <select class="select-input" id="lab3-method">
+      <option value="">-- Selecione o método --</option>
+      <option value="GET">GET</option>
+      <option value="PUT">PUT</option>
+      <option value="OPTIONS">OPTIONS</option>
+      <option value="X-HTTP-Method-Override">Header X-HTTP-Method-Override: POST</option>
+    </select>
+
+    <div class="lab-controls" style="margin-top:16px;">
+      <button class="btn btn-primary" onclick="runLab3()">▶ Testar no Repeater</button>
+    </div>
+    <div class="response-box" id="lab3-response" style="margin-top:12px;display:none;"></div>
+    <div class="lab-feedback" id="lab3-feedback"></div>
+  </div>
+</div>`;
+}
+
+function buildLab4() {
+  return `
+<div class="lab-section" id="lab4">
+  <div class="lab-header">
+    <div class="lab-title">🔬 <span>Lab 4 — IDOR: Enumeração de ID</span> <span class="lab-badge">Interativo</span></div>
+    <div class="lab-status" id="lab4-status">⬜ Pendente</div>
+  </div>
+  <div class="lab-body">
+    <div class="lab-desc">
+      Você está autenticado como usuário ID 1001. O endpoint <code>/api/profile?id=1001</code> retorna seus próprios dados. Você suspeita de IDOR. Qual ID você testa para validar a falha? Digite o ID e observe o comportamento da aplicação.
+    </div>
+
+    <div class="burp-panel">
+      <div class="burp-panel-tabs"><div class="burp-tab active">Request no Repeater</div></div>
+      <div class="burp-panel-content"><span class="http-method">GET</span> <span class="http-path">/api/profile?id=<span id="lab4-id-display">1001</span></span> <span class="http-version">HTTP/1.1</span>
+<span class="http-header-name">Host:</span> <span class="http-host">app.target.lab</span>
+<span class="http-header-name">Cookie:</span> <span class="http-value">session=user_1001_token_abc123</span></div>
+    </div>
+
+    <div style="display:flex;gap:12px;align-items:center;margin:14px 0;">
+      <label style="font-family:var(--mono);font-size:12px;color:var(--text3);">ID a testar:</label>
+      <input type="number" class="text-input" id="lab4-input" placeholder="Digite um ID" style="width:160px;" value="1001">
+      <button class="btn btn-accent2" onclick="updateLab4Id()">↻ Atualizar Request</button>
+    </div>
+
+    <div class="lab-controls">
+      <button class="btn btn-primary" onclick="runLab4()">▶ Enviar via Repeater</button>
+    </div>
+    <div class="response-box" id="lab4-response" style="margin-top:12px;display:none;"></div>
+    <div class="lab-feedback" id="lab4-feedback"></div>
+  </div>
+</div>`;
+}
+
+function buildLab5() {
+  return `
+<div class="lab-section" id="lab5">
+  <div class="lab-header">
+    <div class="lab-title">🔬 <span>Lab 5 — Price Tampering: Lógica de Negócio</span> <span class="lab-badge">Interativo</span></div>
+    <div class="lab-status" id="lab5-status">⬜ Pendente</div>
+  </div>
+  <div class="lab-body">
+    <div class="lab-desc">
+      Uma loja online manda mais informação para o checkout do que deveria: preço unitário, subtotal do cliente, bucket de frete e telemetria de frontend. Isso é o tipo de bagunça que faz muita gente editar o campo errado e sair confiante sem ter provado nada. Sua missão é identificar qual valor o backend está aceitando indevidamente como fonte de verdade.
+    </div>
+
+    <div class="burp-panel">
+      <div class="burp-panel-tabs"><div class="burp-tab active">Request — Editável</div></div>
+      <div class="burp-panel-content" contenteditable="true" id="lab5-request" spellcheck="false"><span class="http-method">POST</span> <span class="http-path">/checkout/confirm</span> <span class="http-version">HTTP/1.1</span>
+<span class="http-header-name">Host:</span> <span class="http-host">shop.target.lab</span>
+<span class="http-header-name">X-Trace-ID:</span> <span class="http-value">edge-7f2a91</span>
+<span class="http-header-name">X-Checkout-Experience:</span> <span class="http-value">v3</span>
+<span class="http-header-name">Content-Type:</span> <span class="http-value">application/json</span>
+<span class="http-header-name">Cookie:</span> <span class="http-value">sess=buyer_token_xyz</span>
+
+<span class="http-body-param">{"productId":"PROD-991","quantity":1,"unitPrice":1299.90,"clientTotal":1299.90,"shippingBand":"gold","telemetry":{"paint":"834ms"},"currency":"BRL"}</span></div>
+    </div>
+
+    <div class="lab-controls">
+      <button class="btn btn-primary" onclick="runLab5()">▶ Confirmar Checkout</button>
+      <button class="btn btn-secondary" onclick="resetLab5()">↺ Resetar</button>
+    </div>
+
+    <div class="response-box" id="lab5-response" style="margin-top:12px;display:none;"></div>
+    <div class="lab-feedback" id="lab5-feedback"></div>
+  </div>
+</div>`;
+}
+
+function buildLab6() {
+  return `
+<div class="lab-section" id="lab6">
+  <div class="lab-header">
+    <div class="lab-title">🔬 <span>Lab Final — Análise Integrada de Request/Response</span> <span class="lab-badge">Avançado</span></div>
+    <div class="lab-status" id="lab6-status">⬜ Pendente</div>
+  </div>
+  <div class="lab-body">
+    <div class="lab-desc">
+      Você recebeu dois requests de um fluxo autenticado. Compare os responses e identifique qual evidência aponta para uma falha de controle de acesso horizontal (IDOR + autorização inconsistente). Selecione a conclusão técnica correta.
+    </div>
+
+    <div class="splitter">
+      <div>
+        <h3 style="margin-bottom:8px;font-size:12px;font-family:var(--mono);color:var(--accent);">REQUEST A — Usuário Legítimo</h3>
+        <div class="response-box" style="font-size:11.5px;"><span class="http-method">GET</span> <span class="http-path">/api/invoice/8801</span> <span class="http-version">HTTP/1.1</span>
+Cookie: <span class="http-value">sess=user_id=8801_token</span>
+
+<span class="http-200">HTTP/1.1 200 OK</span>
+<span class="http-value">{"invoiceId":8801,"owner":8801,
+ "amount":4200.00,"status":"paid"}</span></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom:8px;font-size:12px;font-family:var(--mono);color:var(--accent2);">REQUEST B — Modificado no Repeater</h3>
+        <div class="response-box" style="font-size:11.5px;"><span class="http-method">GET</span> <span class="http-path">/api/invoice/8802</span> <span class="http-version">HTTP/1.1</span>
+Cookie: <span class="http-value">sess=user_id=8801_token</span>
+
+<span class="http-200">HTTP/1.1 200 OK</span>
+<span class="http-value">{"invoiceId":8802,"owner":8802,
+ "amount":9800.00,"status":"pending"}</span></div>
+      </div>
+    </div>
+
+    <h3 style="margin:16px 0 10px;">Qual é a conclusão técnica correta?</h3>
+    <div style="display:flex;flex-direction:column;gap:10px;" id="lab6-options">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;background:var(--bg4);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text2);">
+        <input type="radio" name="lab6q" value="a" style="accent-color:var(--accent);"> A aplicação usa tokens de sessão diferentes por recurso, o que é correto
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;background:var(--bg4);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text2);">
+        <input type="radio" name="lab6q" value="b" style="accent-color:var(--accent);"> O servidor retornou 200 para um recurso de outro usuário sem validar a propriedade — IDOR confirmado
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;background:var(--bg4);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text2);">
+        <input type="radio" name="lab6q" value="c" style="accent-color:var(--accent);"> O response B indica erro de cache — o servidor retornou dados antigos
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;background:var(--bg4);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text2);">
+        <input type="radio" name="lab6q" value="d" style="accent-color:var(--accent);"> O campo owner no JSON é apenas informativo e não representa falha de acesso
+      </label>
+    </div>
+
+    <div class="lab-controls" style="margin-top:16px;">
+      <button class="btn btn-primary" onclick="runLab6()">▶ Submeter Análise Final</button>
+    </div>
+    <div class="lab-feedback" id="lab6-feedback"></div>
+  </div>
+</div>`;
+}
+
+// ── Chapter text builders ──
+function buildCh2() {
+  return `
+<div class="chapter-tag">Capítulo 02 — Protocolo e Identidade</div>
+<h1>HTTP, HTTPS, Headers, Cookies e Sessão</h1>
+<p style="color:var(--text3);font-family:var(--mono);font-size:13px;">Carga horária estimada: ~2h</p>
+
+<div class="ch-intro">
+  Se você não entende o protocolo que está analisando, vai ficar olhando para requests sem saber o que procurar. Esse capítulo não é revisão decorativa de teoria — é o vocabulário mínimo para você reconhecer comportamento anômalo quando ele aparecer na sua frente, em vez de encarar o request com a mesma expressão de quem abriu CSV no Bloco de Notas.
+</div>
+
+<h2>A Anatomia de uma Requisição HTTP</h2>
+<p>Todo request tem a mesma estrutura: linha de método, cabeçalhos e, opcionalmente, corpo. Parece simples. É simples. O que não é simples é saber <em>qual</em> header manipular e <em>por que</em> o servidor responde diferente quando você faz isso.</p>
+
+<div class="code-block"><span class="kw">POST</span> <span class="val">/api/account/update</span> HTTP/1.1
+<span class="hdr">Host:</span> app.exemplo.com
+<span class="hdr">Authorization:</span> Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+<span class="hdr">Content-Type:</span> application/json
+<span class="hdr">Cookie:</span> sessionId=abc123; role=user
+<span class="hdr">X-Forwarded-For:</span> 192.168.1.1  <span class="cmt">← você pode forjar isso</span>
+<span class="hdr">Content-Length:</span> 67
+
+<span class="val">{"email":"novo@email.com","role":"admin","userId":1042}</span></div>
+
+<div class="callout warn">
+  <div class="callout-icon">🎯</div>
+  <div class="callout-body"><strong>Ponto de atenção</strong>
+  Parâmetros no body JSON que incluem campos como <code>role</code>, <code>userId</code>, <code>isAdmin</code> ou <code>plan</code> são convites abertos para manipulação. Se o servidor aceita e processa esse campo vindo do cliente sem validação server-side — você encontrou uma falha.</div>
+</div>
+
+<h2>Headers de Segurança — o que procurar no Response</h2>
+<table class="http-table">
+  <tr><th>Header</th><th>Valor Seguro</th><th>Risco se Ausente</th></tr>
+  <tr><td class="td-key">Strict-Transport-Security</td><td class="td-val">max-age=31536000; includeSubDomains</td><td class="risk-high">Downgrade para HTTP</td></tr>
+  <tr><td class="td-key">X-Content-Type-Options</td><td class="td-val">nosniff</td><td class="risk-med">MIME sniffing attack</td></tr>
+  <tr><td class="td-key">X-Frame-Options</td><td class="td-val">DENY ou SAMEORIGIN</td><td class="risk-med">Clickjacking</td></tr>
+  <tr><td class="td-key">Content-Security-Policy</td><td class="td-val">default-src 'self'</td><td class="risk-high">XSS facilitado</td></tr>
+  <tr><td class="td-key">Referrer-Policy</td><td class="td-val">no-referrer</td><td class="risk-low">Vazamento de URL</td></tr>
+  <tr><td class="td-key">Permissions-Policy</td><td class="td-val">camera=(), microphone=()</td><td class="risk-low">Acesso a recursos do device</td></tr>
+</table>
+
+<h2>Cookies — onde a sessão mora e onde a falha costuma estar</h2>
+<p>O cookie de sessão é, na prática, a identidade do usuário na aplicação. Se o cookie for previsível, roubável ou manipulável, a sessão vai junto. Analise <em>sempre</em> os atributos de cada cookie no response.</p>
+
+<ul class="bullet-list">
+  <li><strong>HttpOnly</strong> — impede acesso via JavaScript. Se ausente, XSS pode roubar o cookie.</li>
+  <li><strong>Secure</strong> — cookie só trafega via HTTPS. Se ausente em produção, pode vazar via HTTP.</li>
+  <li><strong>SameSite=Strict/Lax</strong> — mitiga CSRF. Se ausente ou None sem Secure, risco real.</li>
+  <li><strong>Expires/Max-Age ausente</strong> — cookie de sessão. Expira ao fechar o browser. Pode ser aceitável.</li>
+  <li><strong>Valor previsível</strong> — se o sessionId parece sequencial ou tem padrão visível, é candidato a brute-force.</li>
+</ul>
+
+<h2>Autenticação vs. Autorização — a confusão que cria mais bug</h2>
+<div class="splitter">
+  <div class="card">
+    <div class="card-title" style="color:var(--accent)">Autenticação</div>
+    <div class="card-text">Verifica <em>quem você é</em>. Login, token, certificado. A pergunta é: "você é quem diz ser?"</div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="color:var(--accent2)">Autorização</div>
+    <div class="card-text">Verifica <em>o que você pode fazer</em>. Controle de acesso, roles, permissões. A pergunta é: "você tem direito a isso?"</div>
+  </div>
+</div>
+<div class="callout tip">
+  <div class="callout-icon">💡</div>
+  <div class="callout-body"><strong>Dica de Analista</strong>
+  A maior parte das falhas de controle de acesso não é bug de autenticação — é bug de <em>autorização</em>. A aplicação sabe quem você é, mas não verifica se você pode acessar o recurso solicitado. É aí que o Burp brilha: você autentica legitimamente e depois manipula o ID do recurso no Repeater.</div>
+</div>
+
+<h2>Sessão — estados e ciclo de vida</h2>
+<p>Uma sessão bem implementada deve: usar ID aleatório e longo, invalidar o token no logout (server-side), não incluir informações sensíveis no próprio token (ou assinar com chave forte), e expirar após inatividade. Quando qualquer um desses pontos falha, há superfície de ataque. No Burp, você verifica isso navegando como usuário legítimo, fazendo logout, e tentando reusar o token antigo no Repeater.</p>
+
+<div class="callout danger">
+  <div class="callout-icon">🚫</div>
+  <div class="callout-body"><strong>Ética</strong>
+  Testar invalidação de sessão em aplicações de produção sem autorização é invasão, não pesquisa. Use seu próprio lab, portais de CTF ou plataformas com bug bounty formal.</div>
+</div>
+
+<h2>JWT — o token que todo mundo implementa errado</h2>
+<p>JSON Web Token é amplamente usado e amplamente mal implementado. No Burp, você pode decodificá-lo no Decoder (Base64) ou usar o Inspector integrado. Pontos clássicos de falha: algoritmo <strong>none</strong>, chave secreta fraca, ausência de validação da assinatura, campos de role ou permissão no payload confiados cegamente pelo servidor.</p>
+
+<div class="code-block"><span class="cmt">// Header JWT decodificado</span>
+<span class="val">{"alg": "HS256", "typ": "JWT"}</span>
+
+<span class="cmt">// Payload decodificado — visível sem a chave</span>
+<span class="val">{"sub": "1042", "role": "user", "exp": 1893456000}</span>
+
+<span class="cmt">// Teste: trocar alg para "none" e remover assinatura</span>
+<span class="cmt">// Se o servidor aceitar — falha crítica de validação</span></div>
+`;
+}
+
+function buildCh3() {
+  return `
+<div class="chapter-tag">Capítulo 03 — Exploração Ativa</div>
+<h1>Repeater e Manipulação Manual de Requests</h1>
+<p style="color:var(--text3);font-family:var(--mono);font-size:13px;">Carga horária estimada: ~1h50</p>
+
+<div class="ch-intro">
+  O Repeater é onde você passa de observador para analista ativo. É ali que hipóteses viram evidências. Ou não — e você itera de novo. Esse é o fluxo real de pentest manual.
+</div>
+
+<h2>O que é o Repeater e como usá-lo</h2>
+<p>O Repeater permite enviar, modificar e reenviar requisições HTTP manualmente quantas vezes quiser. Sem automação, sem ruído. Você controla exatamente o que sai e analisa exatamente o que volta. Para enviar um request do HTTP History ao Repeater: <strong>botão direito → Send to Repeater</strong> (ou Ctrl+R).</p>
+
+<div class="flow-diagram">
+  <div class="flow-step"><div class="flow-box">HTTP History</div><div class="flow-label">Captura passiva</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-box accent">Repeater</div><div class="flow-label">Ctrl+R</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-box">Modifica</div><div class="flow-label">param, header, body</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-box">Send</div><div class="flow-label">Ctrl+Space</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-box accent">Analisa</div><div class="flow-label">diff, status, body</div></div>
+</div>
+
+<h2>O que você modifica no Repeater — e o que observar</h2>
+<ul class="bullet-list">
+  <li><strong>Parâmetros de ID</strong> — troca <code>id=1001</code> por <code>id=1000</code>, <code>id=1</code>, <code>id=0</code>. Diferença no response? IDOR candidato.</li>
+  <li><strong>Método HTTP</strong> — POST retorna 403? Tente GET, PUT, PATCH, OPTIONS. Às vezes a validação é por método.</li>
+  <li><strong>Campos de role/privilege</strong> — se o body inclui <code>role</code>, <code>isAdmin</code> ou <code>plan</code>, altere e reenvie.</li>
+  <li><strong>Headers de bypass</strong> — <code>X-Forwarded-For</code>, <code>X-Original-URL</code>, <code>X-Rewrite-URL</code> podem bypassar restrições de IP ou path.</li>
+  <li><strong>Content-Type</strong> — muda de JSON para XML ou form-encoded. Parsers diferentes, comportamentos diferentes.</li>
+</ul>
+
+<h2>Lendo o Response com atenção clínica</h2>
+<p>O que você observa no response é tão importante quanto o que você enviou no request. Status HTTP é só o começo.</p>
+
+<div class="card-grid">
+  <div class="card"><div class="card-icon">🔢</div><div class="card-title">Status Code</div><div class="card-text">200 ≠ seguro. 403 ≠ definitivo. 302 pode revelar destino. 500 pode revelar stack trace com info sensível.</div></div>
+  <div class="card"><div class="card-icon">📏</div><div class="card-title">Content-Length</div><div class="card-text">Response diferente em tamanho com mesmo parâmetro? Provavelmente dados diferentes. Possível IDOR.</div></div>
+  <div class="card"><div class="card-icon">⏱️</div><div class="card-title">Tempo de Resposta</div><div class="card-text">Delay diferente em input específico pode indicar SQL injection via time-based ou processamento assíncrono.</div></div>
+  <div class="card"><div class="card-icon">📝</div><div class="card-title">Mensagem de Erro</div><div class="card-text">Erro verboso com stack trace, query SQL ou path de arquivo é informação valiosa. Documente tudo.</div></div>
+</div>
+
+<h2>Verb Tampering — quando o método importa</h2>
+<p>Algumas aplicações implementam controle de acesso baseado no método HTTP. O endpoint pode aceitar GET sem autenticação mas exigir autenticação para POST — ou o contrário. Teste sistematicamente os métodos disponíveis.</p>
+
+<div class="code-block"><span class="cmt">// Sequência de teste típica no Repeater</span>
+<span class="kw">GET</span> <span class="val">/api/admin/config</span> → 403 Forbidden
+<span class="kw">POST</span> <span class="val">/api/admin/config</span> → 403 Forbidden
+<span class="kw">OPTIONS</span> <span class="val">/api/admin/config</span> → 200 OK  <span class="cmt">← Allow: GET, POST, PUT, DELETE</span>
+<span class="kw">PUT</span> <span class="val">/api/admin/config</span> → 200 OK  <span class="cmt">← FALHA: PUT não tinha restrição</span></div>
+
+<h2>Comparer — diferença que faz diferença</h2>
+<p>O Comparer do Burp permite comparar dois responses byte a byte. Use para identificar diferenças entre: resposta com usuário A vs. usuário B, resposta com ID válido vs. inválido, response com e sem token de autenticação. A diferença entre os responses frequentemente aponta exatamente onde está a falha.</p>
+
+<div class="callout tip">
+  <div class="callout-icon">💡</div>
+  <div class="callout-body"><strong>Dica de Analista</strong>
+  No Repeater, guarde histórico de requests usando as abas. Dê nomes descritivos como "original", "role=admin", "id=1001→1000". Sem histórico, você vai recriar o mesmo request cinco vezes e perder o fio da análise.</div>
+</div>
+
+<div class="callout warn">
+  <div class="callout-icon">⚠️</div>
+  <div class="callout-body"><strong>Erro Comum</strong>
+  Confundir 403 com "seguro". Um 403 pode ser bypassado por header alternativo, método diferente ou path normalizado. 403 é apenas o servidor dizendo que existe — é o início da investigação, não o fim.</div>
+</div>
+`;
+}
+
+function buildCh4() {
+  return `
+<div class="chapter-tag">Capítulo 04 — Mapeamento</div>
+<h1>Superfície de Ataque, Parâmetros e Inputs</h1>
+<p style="color:var(--text3);font-family:var(--mono);font-size:13px;">Carga horária estimada: ~2h</p>
+
+<div class="ch-intro">
+  Antes de explorar, você precisa saber o que existe. Mapeamento de superfície de ataque não é glamouroso, mas é a diferença entre um relatório de 3 páginas e um relatório vazio com autoestima alta. Quem não mapeia, não acha.
+</div>
+
+<h2>O que compõe a Superfície de Ataque</h2>
+<div class="card-grid">
+  <div class="card"><div class="card-icon">🔗</div><div class="card-title">Endpoints</div><div class="card-text">Toda URL única, método HTTP e versão de API é um endpoint. /api/v1 e /api/v2 do mesmo recurso podem ter controles diferentes.</div></div>
+  <div class="card"><div class="card-icon">📥</div><div class="card-title">Inputs</div><div class="card-text">Parâmetros de query string, body JSON, form fields, path params, headers customizados. Tudo que o servidor processa é input.</div></div>
+  <div class="card"><div class="card-icon">🔐</div><div class="card-title">Estados Autenticados</div><div class="card-text">Fluxos que só existem após login. Frequentemente testados menos, e frequentemente onde as falhas mais críticas moram.</div></div>
+  <div class="card"><div class="card-icon">🌐</div><div class="card-title">APIs de Terceiros</div><div class="card-text">Webhooks, callbacks, integrações. Podem ter controles de autenticação diferentes do frontend principal.</div></div>
+</div>
+
+<h2>Mapeamento Passivo com o HTTP History</h2>
+<p>Navegue a aplicação como usuário normal com o Intercept OFF. O Burp registra tudo. Explore todos os fluxos: login, cadastro, perfil, dashboard, configurações, pagamento, logout. Ao final, o HTTP History é seu mapa de superfície de ataque — sem precisar de spider automático.</p>
+
+<ul class="bullet-list">
+  <li>Filtre por <strong>2xx</strong> para endpoints que existem e respondem</li>
+  <li>Filtre por <strong>3xx</strong> para redirecionamentos — destino pode revelar estrutura interna</li>
+  <li>Observe <strong>parâmetros repetidos</strong> em diferentes endpoints — consistência de validação?</li>
+  <li>Marque endpoints com IDs sequenciais (<code>/user/1042</code>) para teste de IDOR posterior</li>
+  <li>Identifique endpoints que diferem apenas na versão (<code>/v1/</code> vs <code>/v2/</code>)</li>
+</ul>
+
+<h2>Parâmetros — onde a lógica encontra a entrada do usuário</h2>
+<p>Cada parâmetro é uma oportunidade. O que o servidor faz com esse valor? Ele consulta banco? Renderiza na tela? Redireciona? Passa para outro sistema? A função determina o risco. Classifique mentalmente cada parâmetro que encontrar.</p>
+
+<table class="http-table">
+  <tr><th>Tipo de Parâmetro</th><th>Exemplo</th><th>Risco Potencial</th></tr>
+  <tr><td class="td-key">ID de Recurso</td><td class="td-val">?id=1042</td><td class="risk-high">IDOR</td></tr>
+  <tr><td class="td-key">Redirect URL</td><td class="td-val">?next=/dashboard</td><td class="risk-high">Open Redirect, SSRF</td></tr>
+  <tr><td class="td-key">Papel / Privilege</td><td class="td-val">role=user</td><td class="risk-high">Privilege Escalation</td></tr>
+  <tr><td class="td-key">Path de Arquivo</td><td class="td-val">?template=invoice.html</td><td class="risk-high">Path Traversal</td></tr>
+  <tr><td class="td-key">Filtro de Busca</td><td class="td-val">?q=admin</td><td class="risk-med">SQLi, XSS reflexivo</td></tr>
+  <tr><td class="td-key">Preço / Valor</td><td class="td-val">price=1299.90</td><td class="risk-high">Business Logic Flaw</td></tr>
+  <tr><td class="td-key">Versão de API</td><td class="td-val">/api/v1/users</td><td class="risk-med">Controles inconsistentes</td></tr>
+</table>
+
+<h2>Enumeração Manual de Endpoints</h2>
+<p>Na Community Edition, não há spider automático de qualidade. Mas você pode enumerar manualmente com estratégia. Analise o JavaScript da aplicação em busca de rotas hardcoded. Observe padrões nas URLs visitadas. Tente variações de paths comuns.</p>
+
+<div class="code-block"><span class="cmt">// Padrões a tentar manualmente no Repeater</span>
+<span class="val">/api/admin/users</span>      <span class="cmt">← endpoint administrativo exposto?</span>
+<span class="val">/api/v2/profile</span>       <span class="cmt">← versão antiga com menos controles?</span>
+<span class="val">/api/internal/stats</span>   <span class="cmt">← rota "interna" acessível externamente?</span>
+<span class="val">/api/debug/info</span>       <span class="cmt">← endpoint de debug em produção?</span>
+<span class="val">/.git/config</span>          <span class="cmt">← exposição de repositório (GET simples)</span></div>
+
+<div class="callout tip">
+  <div class="callout-icon">💡</div>
+  <div class="callout-body"><strong>Dica de Analista</strong>
+  Analise o JavaScript da aplicação no Burp. Em Target → Site Map, clique com botão direito nos arquivos JS → Send to Repeater. Examine o conteúdo: endpoints, parâmetros e chaves de API frequentemente ficam expostos no JS client-side — porque o desenvolvedor achou que ninguém ia olhar.</div>
+</div>
+
+<h2>Autenticação em Múltiplos Contextos</h2>
+<p>Muitas aplicações têm fluxos distintos com controles diferentes: usuário comum, usuário premium, moderador, administrador. Crie contas em cada nível disponível. No Burp, use a aba de Proxy para alternar entre sessões. Compare o que cada perfil vê — e especialmente o que um perfil menos privilegiado consegue acessar diretamente via URL ou API.</p>
+`;
+}
+
+function buildCh5() {
+  return `
+<div class="chapter-tag">Capítulo 05 — Prática Guiada</div>
+<h1>Casos Reais: Falhas Comuns em Aplicações Web</h1>
+<p style="color:var(--text3);font-family:var(--mono);font-size:13px;">Carga horária estimada: ~2h</p>
+
+<div class="ch-intro">
+  Teoria sem prática é só vocabulário bonito. Aqui você vai ver os padrões de falha que aparecem repetidamente no mercado — em bug bounty, em pentests, em CTFs e, infelizmente, em produção. Reconhecer o padrão é 80% do trabalho.
+</div>
+
+<h2>IDOR — Insecure Direct Object Reference</h2>
+<p>Você acessa um recurso pelo seu identificador. A aplicação não verifica se você tem direito a esse recurso específico — só verifica se você está autenticado. Resultado: qualquer usuário autenticado acessa qualquer recurso de qualquer outro usuário.</p>
+
+<div class="code-block"><span class="cmt">// Fluxo de descoberta típica</span>
+<span class="kw">GET</span> <span class="val">/api/receipts/4421</span> → 200 OK (seu recibo)
+<span class="kw">GET</span> <span class="val">/api/receipts/4420</span> → 200 OK (recibo de outro usuário)
+<span class="kw">GET</span> <span class="val">/api/receipts/4419</span> → 200 OK (mais um)
+<span class="cmt">// O servidor valida autenticação mas não autorização por recurso</span></div>
+
+<div class="callout info">
+  <div class="callout-icon">ℹ️</div>
+  <div class="callout-body"><strong>Por que acontece</strong>
+  O desenvolvedor implementa o login mas esquece de adicionar: "esse recurso pertence ao usuário logado?" na query do banco. Uma linha de código que costuma valer de P2 a P1 em bug bounty.</div>
+</div>
+
+<h2>Broken Access Control — Controle de Acesso Quebrado</h2>
+<p>Categoria mais ampla que IDOR. Inclui: acesso a endpoints de admin sem ser admin, escalada horizontal (acessar dados de outro usuário de mesmo nível), escalada vertical (acessar funcionalidades de nível superior), bypass de restrições via método alternativo.</p>
+
+<ul class="bullet-list">
+  <li>Acesse endpoints admin via URL direta sem token de admin</li>
+  <li>Altere o campo <code>role</code> no body do request e veja se o servidor processa</li>
+  <li>Tente <code>X-Original-URL: /admin</code> com request para <code>/</code></li>
+  <li>Teste path normalizado: <code>/admin/</code>, <code>/ADMIN/</code>, <code>/admin..;/</code></li>
+</ul>
+
+<h2>Business Logic Flaw — Falha de Lógica de Negócios</h2>
+<p>Scanner automático não encontra. Requer entender o fluxo de negócio e identificar onde as regras não são impostas tecnicamente. Exemplos clássicos: preço enviado pelo cliente e não validado no servidor, quantidade negativa gerando crédito, cupom de desconto aplicável múltiplas vezes, fluxo de pagamento bypassável.</p>
+
+<div class="code-block"><span class="cmt">// Exemplo: cupom sem limite de uso</span>
+<span class="kw">POST</span> <span class="val">/checkout</span>
+<span class="val">{"coupon":"PROMO10","quantity":1,"price":99.00}</span>
+
+<span class="cmt">// Mesmo coupon, segundo request — aceito novamente</span>
+<span class="kw">POST</span> <span class="val">/checkout</span>
+<span class="val">{"coupon":"PROMO10","quantity":1,"price":99.00}</span>
+
+<span class="cmt">// Servidor não valida uso anterior por sessão ou por conta</span></div>
+
+<h2>Verb Tampering — Burlar Restrição por Método</h2>
+<p>A aplicação restringe POST mas não GET para uma ação sensível. Ou aceita o header <code>X-HTTP-Method-Override</code> sem validar se o método sobreposto também seria restrito. Resultado: ação privilegiada executada via método não esperado.</p>
+
+<h2>Information Disclosure — Mais do que deveria mostrar</h2>
+<p>Erros verbosos com stack trace, respostas com campos extras em JSON, headers de servidor expondo versão, comentários em HTML com credenciais, arquivos de debug em produção. No Burp, analise cada response com atenção — não só os campos "esperados".</p>
+
+<div class="callout tip">
+  <div class="callout-icon">💡</div>
+  <div class="callout-body"><strong>Dica de Analista</strong>
+  Em respostas JSON, expanda tudo. Aplicações frequentemente retornam campos extras que o frontend ignora mas que revelam dados de outros usuários, IDs internos, flags de feature ou informações de infraestrutura. O que o frontend não exibe ainda está no response.</div>
+</div>
+
+<h2>Session Management — Invalidação e Reutilização</h2>
+<p>Após o logout, o token deve ser invalidado <em>server-side</em>. Se apenas o cookie é removido do browser mas o servidor ainda aceita o token antigo, qualquer pessoa que tenha capturado o token (XSS, log, tráfego HTTP) pode reutilizá-lo. Teste no Repeater: faça logout, copie o token antigo, tente um request autenticado. Se retornar 200 — falha de invalidação.</p>
+
+<div class="callout danger">
+  <div class="callout-icon">🚫</div>
+  <div class="callout-body"><strong>Ética e Escopo</strong>
+  Os padrões de ataque descritos aqui são para reconhecimento de vulnerabilidades em ambientes autorizados. Em programas de bug bounty, leia o policy antes de testar qualquer coisa. Extrapolação de escopo resulta em banimento — no mínimo.</div>
+</div>
+`;
+}
+
+function buildCh6() {
+  return `
+<div class="chapter-tag">Capítulo 06 — Síntese</div>
+<h1>Laboratório Final: Raciocínio Técnico Integrado</h1>
+<p style="color:var(--text3);font-family:var(--mono);font-size:13px;">Carga horária estimada: ~1h30</p>
+
+<div class="ch-intro">
+  Chegou a hora de integrar tudo. Neste capítulo, você não vai aprender uma técnica nova — vai aplicar o raciocínio de analista para correlacionar evidências, priorizar achados e pensar como quem escreve um relatório profissional. O lab final exige que você reúna o que aprendeu nos cinco capítulos anteriores.
+</div>
+
+<h2>O Raciocínio do Analista — do Request ao Risco</h2>
+<p>Encontrar um comportamento anômalo é apenas a primeira etapa. Um analista competente precisa confirmar a reprodutibilidade, entender o impacto real, classificar o risco com evidência e saber comunicar a descoberta de forma compreensível para quem vai corrigir. Relatório sem evidência é literatura; evidência sem contexto é só ruído caro.</p>
+
+<div class="flow-diagram">
+  <div class="flow-step"><div class="flow-box">Observar</div><div class="flow-label">Comportamento anômalo</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-box">Hipótese</div><div class="flow-label">O que pode estar errado?</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-box">Testar</div><div class="flow-label">Repeater + variações</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-box">Confirmar</div><div class="flow-label">Reproduzível?</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-box accent">Documentar</div><div class="flow-label">Request + response + impacto</div></div>
+</div>
+
+<h2>Classificação de Risco com Evidência</h2>
+<p>Não classifique risco por intuição — classifique por evidência. CVSS é um framework, mas para análise manual o que importa é: qual é o impacto máximo possível? Qual o esforço necessário para explorar? Precisa de autenticação? É reproduzível de forma confiável?</p>
+
+<div class="card-grid">
+  <div class="card"><div class="card-icon" style="color:var(--danger)">🔴</div><div class="card-title">Crítico / Alto</div><div class="card-text">Acesso a dados de outros usuários, execução de ação privilegiada, vazamento de credenciais. Evidência direta no response.</div></div>
+  <div class="card"><div class="card-icon" style="color:var(--warn)">🟡</div><div class="card-title">Médio</div><div class="card-text">Informação sensível exposta mas sem impacto imediato, bypass parcial de controle, falha que requer condições específicas.</div></div>
+  <div class="card"><div class="card-icon" style="color:var(--accent)">🟢</div><div class="card-title">Baixo / Info</div><div class="card-text">Headers de segurança ausentes, versão de software exposta, endpoint de diagnóstico sem dados sensíveis.</div></div>
+</div>
+
+<h2>Documentação de Achados — o que não está escrito não aconteceu</h2>
+<p>Para cada achado, documente: request completo (método, URL, headers, body), response completo, passo a passo de reprodução, impacto concreto (o que um atacante consegue fazer?), sugestão de remediação. No Burp, use Ctrl+C no request/response para copiar em formato raw. Use o Comparer para gerar evidência de diferença entre requests.</p>
+
+<h2>O que a Community Edition te ensina que a Professional não vai</h2>
+<p>Parece contraditivo, mas trabalhar com a Community Edition força você a desenvolver o músculo mais importante da análise de segurança: <strong>raciocínio manual</strong>. Sem automação, você precisa entender o protocolo, identificar o padrão, formular hipóteses e testá-las com precisão cirúrgica. Quando você eventualmente migrar para a Professional — e você vai, cedo ou tarde — vai usar o scanner para confirmar o que sua análise manual já descobriu. Não o contrário.</p>
+
+<div class="callout tip">
+  <div class="callout-icon">💡</div>
+  <div class="callout-body"><strong>Dica Final</strong>
+  Crie um template de análise pessoal. Para cada aplicação testada: lista de endpoints mapeados, parâmetros identificados, fluxos testados, anomalias observadas, achados confirmados. Esse template vai se tornar seu processo — e processo é o que diferencia analista de amador.</div>
+</div>
+
+<h2>Próximos Passos — além deste curso</h2>
+<ul class="bullet-list">
+  <li><strong>PortSwigger Web Security Academy</strong> — labs gratuitos de altíssima qualidade, criados pelo time do Burp. Faça todos.</li>
+  <li><strong>HackTheBox / TryHackMe</strong> — machines e rooms de aplicações web com Burp Suite como ferramenta principal.</li>
+  <li><strong>Programas de Bug Bounty</strong> — HackerOne e Bugcrowd têm programas públicos para iniciantes. Leia o policy, defina escopo, reporte com evidência.</li>
+  <li><strong>OWASP Testing Guide</strong> — referência técnica para metodologia de teste de aplicações web.</li>
+  <li><strong>Burp Suite Professional</strong> — quando estiver confortável com análise manual, a Professional amplifica sua produtividade. Não substitui o raciocínio.</li>
+</ul>
+`;
+}
+
+// ── QUESTION BUILDERS ──
+function buildQ1() {
+  return [
+    {
+      text: 'Durante um login em ambiente com CDN, tag de analytics e três requests de fonte externa no History, você ativa o Intercept e o navegador "congela". No painel do Burp há um POST `/api/auth/login` parado com header `X-Trace-Id`. Qual leitura é a mais precisa?',
+      opts: [
+        'O request legítimo ficou retido no Proxy aguardando decisão do analista; o trace ID e o ruído externo não mudam o fato de que é preciso revisar e dar Forward ou Drop.',
+        'A CDN detectou o proxy local e abriu um desafio invisível; o comportamento esperado é reiniciar o browser e limpar HSTS.',
+        'O header `X-Trace-Id` indica falha de correlação no backend; por isso o Burp segura a requisição até o servidor responder.',
+        'As chamadas de analytics saturaram a fila do Proxy; a correção certa é mover o listener para a porta 8443 antes de testar de novo.',
+      ],
+      exp: 'A evidência útil é objetiva: com Intercept ligado, o POST de login está parado no Proxy. O congelamento do navegador vem da pausa intencional da requisição, não de magia negra da CDN. `X-Trace-Id`, analytics e fontes externas são ruído operacional comum em aplicações modernas; eles atrapalham a leitura de quem se assusta com LED piscando, mas não mudam o diagnóstico. A ação correta é revisar o request, decidir se ele deve seguir ou ser descartado e então usar Forward ou Drop.',
+      wrongs: [
+        '<strong>B — Sedutora, mas errada:</strong> CDN e desafio anti-bot podem existir, porém o cenário já mostra o POST retido localmente. Quando o request está parado no Intercept, o problema está entre cadeira e Burp, não em HSTS místico.',
+        '<strong>C — Errada:</strong> `X-Trace-Id` serve para observabilidade. Ele não faz o Burp “esperar o backend”; quem segura o fluxo é o próprio Proxy quando o Intercept está ativo.',
+        '<strong>D — Errada:</strong> Ruído de analytics polui o History, mas não justifica congelamento seletivo de um request interceptado. Trocar porta aqui seria mexer no painel elétrico porque a lâmpada está apagada da tomada.',
+      ],
+    },
+    {
+      text: 'No HTTP History aparecem requisições para `/collect`, `/rum`, fontes, ícones, `cdn-cgi` e dois hosts da aplicação. Você quer reduzir ruído sem perder evidência útil do fluxo autenticado. Qual ajuste oferece a melhor relação entre precisão e esforço?',
+      opts: [
+        'Manter tudo como está e confiar apenas na ordenação por horário, porque ruído também pode ser inteligência de ameaça.',
+        'Definir o Target Scope para os hosts da aplicação e filtrar o History por itens in-scope, deixando terceiros fora do foco analítico.',
+        'Ativar Intercept para tudo e usar Drop manual em cada request irrelevante até o fluxo principal ficar limpo.',
+        'Desabilitar o Proxy e usar somente Repeater, porque histórico passivo com terceiros tende a enviesar a análise.',
+      ],
+      exp: 'Configurar Scope e filtrar o History por itens in-scope é o caminho profissional: reduz ruído operacional, preserva os requests relevantes e não destrói captura passiva. Fontes, analytics, RUM e CDN geram volume, mas quase nunca são o centro do achado quando você está analisando autenticação e autorização da aplicação alvo. O objetivo é separar sinal de barulho sem amputar visibilidade.',
+      wrongs: [
+        '<strong>A — Parcial, mas fraca:</strong> Ruído às vezes ajuda em contexto forense, porém deixar tudo misturado por preguiça torna a revisão menos precisa e mais lenta.',
+        '<strong>C — Errada:</strong> Drop manual em massa consome atenção demais e ainda aumenta a chance de descartar algo importante. É o tipo de “controle fino” que só produz sofrimento.',
+        '<strong>D — Errada:</strong> Sem Proxy você perde justamente a coleta passiva que alimenta o History. Repeater complementa análise; não substitui observação do fluxo real.',
+      ],
+    },
+    {
+      text: 'Um colega diz que a edição Community “serve só para brincar” porque a aplicação usa TLS 1.3, SPA com API JSON e redirects encadeados por SSO. Qual afirmação sobre a limitação real da Community está mais correta?',
+      opts: [
+        'O gargalo real está no Intruder com atrasos artificiais entre tentativas; para teste manual com Proxy, Repeater e Decoder a Community continua plenamente utilizável.',
+        'A Community não intercepta TLS 1.3, então SPA moderna com API JSON exige obrigatoriamente a edição Professional.',
+        'O módulo Repeater na Community impõe limite baixo de reenvios por aba, o que inviabiliza comparação manual de responses.',
+        'Decoder e Comparer são exclusivos da Professional, por isso a Community fica limitada a olhar tráfego sem manipular nada.',
+      ],
+      exp: 'A limitação mais relevante da Community, em comparação prática, é o throttling do Intruder para abuso automatizado. Para trabalho manual — Proxy, Repeater, Decoder, Comparer e revisão do History — a edição gratuita continua extremamente útil. TLS 1.3, APIs JSON e redirects de SSO não anulam a ferramenta. O erro do colega é confundir falta de scanner confortável com impossibilidade técnica.',
+      wrongs: [
+        '<strong>B — Errada:</strong> A Community intercepta HTTPS e TLS modernos normalmente, desde que o certificado CA esteja instalado e o fluxo de proxy esteja correto.',
+        '<strong>C — Errada:</strong> Repeater não tem esse limite baixo inventado. Se o analista cansar antes da ferramenta, a culpa não é do software.',
+        '<strong>D — Errada:</strong> Decoder e Comparer existem na Community. Sem eles a ferramenta seria bem mais manca do que realmente é.',
+      ],
+    },
+    {
+      text: 'Você capturou um PATCH `/api/profile` com JSON, `If-Match`, cookie de sessão e um header `X-Request-Id` gerado pelo gateway. Quer testar mutações sem quebrar a navegação do navegador nem refazer todo o fluxo com MFA. Qual fluxo é o mais adequado?',
+      opts: [
+        'Selecionar o request no HTTP History, enviar ao Repeater e iterar ali, preservando a sessão atual e o estado do browser.',
+        'Reexecutar o fluxo com Intercept ligado em cada passo, porque qualquer request com `If-Match` só pode ser manipulado no Proxy ao vivo.',
+        'Copiar a URL para a barra do navegador e alterar o corpo do PATCH via DevTools, já que headers como `If-Match` são recriados pelo browser.',
+        'Usar apenas o Comparer primeiro, porque ele reconstrói o request editável a partir do response mais recente.',
+      ],
+      exp: 'Quando o request já foi capturado e você quer iterar com calma, Repeater é o lugar certo. Ele permite alterar corpo, headers, cookies e observar o response sem bagunçar a navegação ativa nem repetir MFA desnecessariamente. `If-Match` e `X-Request-Id` fazem parte do cenário operacional, mas não impedem replay manual. O analista eficiente evita teatro e move o request para o instrumento certo.',
+      wrongs: [
+        '<strong>B — Errada:</strong> Dá para testar no Proxy ao vivo, mas repetir o fluxo inteiro quando o request já está no History é desperdício operacional.',
+        '<strong>C — Errada:</strong> Barra de endereço não resolve PATCH com body e headers customizados. Isso seria improviso ruim, não método.',
+        '<strong>D — Errada:</strong> Comparer compara conteúdo; ele não substitui Repeater como bancada de mutação de requests.',
+      ],
+    },
+    {
+      text: 'Você configurou o browser para `127.0.0.1:8080`. HTTP funciona, mas em HTTPS o navegador mostra certificado inválido enquanto o Burp registra a tentativa. Há também headers como `Strict-Transport-Security` e `cf-ray` no response quando o fluxo passa sem interceptação. Qual causa explica melhor o erro?',
+      opts: [
+        'O domínio usa HSTS e, por isso, a Community não consegue apresentar certificado intermediário aceitável ao navegador.',
+        'O header `cf-ray` do provedor de borda entra em conflito com o certificado gerado localmente pelo Burp.',
+        'A aplicação exige ALPN específico e o listener 8080 não negocia HTTPS moderno na edição gratuita.',
+        'O CA do Burp não foi instalado como autoridade confiável no navegador; HSTS e headers de borda são acessórios, não a causa raiz.',
+      ],
+      exp: 'Se HTTP funciona e HTTPS falha com aviso de certificado, a causa raiz clássica é a ausência do CA do Burp como autoridade confiável no navegador. HSTS e headers de borda como `cf-ray` parecem sofisticados e intimidam quem gosta de culpar a nuvem antes do básico, mas não substituem o fato de que o browser não confia na cadeia apresentada pelo proxy. Importar o CA do Burp resolve o problema estrutural.',
+      wrongs: [
+        '<strong>A — Errada:</strong> HSTS dificulta alguns cenários, mas não transforma a Community em incapaz de interceptar HTTPS. O problema descrito é de confiança na CA.',
+        '<strong>B — Errada:</strong> `cf-ray` é identificador operacional do provedor de borda. Não “quebra” certificado local por telepatia.',
+        '<strong>C — Errada:</strong> A hipótese de ALPN até existe em troubleshooting avançado, mas aqui o sintoma clássico continua sendo CA não confiável.',
+      ],
+    },
+  ];
+}
+
+function buildQ2() {
+  return [
+    {
+      text: 'Você intercepta um response de login com `Set-Cookie: sessionId=abc123; Path=/; Secure`. No mesmo fluxo há `X-Request-Id`, `Server-Timing` e um pixel de analytics no History. Qual leitura prioriza o risco real sem se distrair com enfeite operacional?',
+      opts: [
+        'Falta `HttpOnly`; isso expõe o cookie de sessão à leitura por JavaScript em cenário de XSS e pode permitir sequestro direto da sessão.',
+        'Falta `Domain`; isso amplia indevidamente o cookie para qualquer subdomínio e tende a causar sobrescrita remota do valor.',
+        'Falta `Expires`; sem persistência o cookie fica mais perigoso, porque o navegador reaproveita o valor indefinidamente entre reinícios.',
+        'Falta `Priority`; sem esse atributo o navegador envia o cookie antes do carregamento do pixel e pode vazar a sessão para terceiros.',
+      ],
+      exp: 'O ponto prioritário é a ausência de `HttpOnly`. Em um cenário com XSS, o atacante consegue ler o cookie via JavaScript e reutilizar o `sessionId` para assumir a sessão do usuário. `Server-Timing`, pixels e IDs de correlação poluem o cenário, mas não redefinem a hierarquia do risco. `Secure` já está presente, então o caminho crítico restante é impedir acesso client-side ao cookie sensível.',
+      wrongs: [
+        '<strong>B — Errada:</strong> `Domain` ausente costuma restringir o cookie ao host atual, o que tende a ser mais seguro, não menos.',
+        '<strong>C — Errada:</strong> Sem `Expires`, o cookie vira session cookie e tende a morrer ao fechar o navegador. Isso não o torna “eterno”; torna você menos criativo no chute.',
+        '<strong>D — Errada:</strong> `Priority` existe em alguns contextos, mas não é a falha crítica de segurança deste cenário nem explica vazamento automático para terceiros.',
+      ],
+    },
+    {
+      text: 'No Decoder você vê um JWT com `{"sub":"1042","role":"user","exp":1893456000}`. O fluxo ainda traz `X-Forwarded-For`, `traceparent` e um banner de WAF no response. Qual teste inicial é mais eficiente para avaliar validação do token sem cair em ruído?',
+      opts: [
+        'Alterar apenas o `traceparent`, porque mudanças de tracing costumam mostrar se o backend revalida o token a cada request.',
+        'Editar o claim `role` para `admin`, reenviar o token e observar se o servidor aceita um JWT adulterado sem assinatura válida.',
+        'Trocar o `sub` para outro usuário, mantendo a assinatura quebrada, porque mudança de sujeito sempre é mais forte do que mudança de privilégio.',
+        'Forçar expiração no passado e concluir que, se o logout funcionar, a assinatura também está sendo validada corretamente.',
+      ],
+      exp: 'O teste mais valioso logo no começo é adulterar um claim sensível, como `role`, sem possuir a chave de assinatura, e observar se o servidor aceita o token. Se aceitar, a validação criptográfica está ausente ou quebrada — um desastre muito maior do que discutir tracing. `traceparent`, WAF banner e cabeçalhos de borda são barulho operacional. Mudar `sub` também é útil, mas elevar privilégio costuma dar resposta mais clara e impacto mais evidente na primeira passada.',
+      wrongs: [
+        '<strong>A — Errada:</strong> `traceparent` ajuda observabilidade; não é controle de integridade do JWT.',
+        '<strong>C — Parcial, mas não ideal:</strong> Alterar `sub` também testa integridade, porém o impacto de `role=admin` tende a gerar um sinal mais inequívoco na primeira rodada.',
+        '<strong>D — Errada:</strong> Expiração e logout são controles diferentes de validação de assinatura. Misturar tudo no mesmo saco é como chamar qualquer erro 500 de “instabilidade”.',
+      ],
+    },
+    {
+      text: 'Após logout, o front-end apaga o JWT do `localStorage` e redireciona para `/login?logout=1`. No Burp ainda existem requests antigos com `Authorization: Bearer ...`, além de chamadas de telemetry em paralelo. O que confirma de fato se a sessão foi invalidada server-side?',
+      opts: [
+        'Verificar se o navegador limpou o `localStorage`, porque sessão removida no cliente indica revogação completa no backend.',
+        'Observar se o redirect de logout retorna 302, já que aplicações seguras sempre revogam sessão quando redirecionam.',
+        'Comparar o tamanho do HTML da tela de login antes e depois do logout para garantir que o estado do usuário foi destruído.',
+        'Reenviar no Repeater um request autenticado com o token antigo e validar se o servidor devolve 401/403 em vez de dados.',
+      ],
+      exp: 'Revogação real se prova no backend. A pergunta certa não é “o front apagou o token?”, e sim “o servidor ainda aceita esse token antigo?”. Reenviar um request autenticado com o valor anterior e verificar se há `401/403` é a validação objetiva. Telemetria, redirects e limpeza visual do front-end são ruído operacional útil para contexto, mas insuficiente para afirmar invalidação da sessão.',
+      wrongs: [
+        '<strong>A — Errada:</strong> Remover token do lado do cliente só prova higiene do front-end. O backend pode continuar aceitando o valor roubado.',
+        '<strong>B — Errada:</strong> Redirect de logout é comportamento de UX, não atestado de revogação. Seria ótimo se segurança viesse com selo no 302, mas não vem.',
+        '<strong>C — Errada:</strong> Tamanho de HTML não comprova estado de sessão. Comprova, no máximo, que a interface sabe fingir bem.',
+      ],
+    },
+    {
+      text: 'Um response inclui `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN` e `Content-Security-Policy: default-src \'self\'`. Há também um `Set-Cookie` de sessão sem `SameSite`. Qual conclusão é mais sólida?',
+      opts: [
+        'Os demais headers compensam a ausência de `SameSite`, então o risco residual é mínimo em ambiente moderno.',
+        'A falta de `SameSite` ainda importa, porque pode facilitar cenários de CSRF mesmo com outros headers corretos.',
+        'A presença de CSP elimina risco de CSRF, já que o browser impede submissão cross-site de formulários automaticamente.',
+        'Como existe HSTS, o cookie de sessão jamais será enviado em contexto cross-site, então `SameSite` é opcional.',
+      ],
+      exp: 'Os headers presentes são bons sinais de maturidade, mas não anulam o papel de `SameSite` na mitigação de CSRF. CSP, HSTS e `nosniff` tratam outras superfícies. Um programa defensivo maduro não usa um header bonito para fingir que outro controle virou desnecessário. A ausência de `SameSite` segue sendo um ponto relevante a validar conforme o fluxo de autenticação e as proteções server-side existentes.',
+      wrongs: [
+        '<strong>A — Errada:</strong> Controles diferentes mitigam riscos diferentes. Não existe “combo promocional” em que HSTS cobre CSRF de brinde.',
+        '<strong>C — Errada:</strong> CSP não substitui proteção anti-CSRF. Ela ajuda em conteúdo e script, não em intenção do request.',
+        '<strong>D — Errada:</strong> HSTS força HTTPS; não regula o contexto de envio cross-site do cookie.',
+      ],
+    },
+    {
+      text: 'Você nota que a API aceita o mesmo endpoint com `application/json` e `application/x-www-form-urlencoded`. No JSON, `isAdmin=true` é ignorado; no form-encoding, o campo é aceito e altera o perfil. Há também um header `x-envoy-upstream-service-time` confundindo o time. O que isso revela?',
+      opts: [
+        'O proxy reverso altera o schema dos requests e só por isso o form-encoding se torna mais privilegiado que JSON.',
+        'JSON é inerentemente mais seguro; o comportamento mostra que o backend deveria proibir form-encoding em qualquer API.',
+        'Há caminhos de parsing/validação inconsistentes por Content-Type; um deles aceita campo privilegiado que deveria ser bloqueado em camada comum.',
+        'O header do Envoy prova que o bug está no balanceador, não na aplicação, porque a decisão mudou conforme o formato.',
+      ],
+      exp: 'Quando o mesmo endpoint aceita formatos diferentes e só um deles aplica validação fraca para um campo privilegiado, o problema é arquitetura inconsistente de parsing e validação. O backend está tratando entradas equivalentes por caminhos distintos e permitindo que um deles bypassasse a whitelist de campos. `x-envoy-upstream-service-time` é ruído operacional do caminho de rede; não explica privilégio concedido por má validação lógica.',
+      wrongs: [
+        '<strong>A — Errada:</strong> Proxy reverso não “inventa” autorização diferenciada por Content-Type sozinho. O defeito está na lógica que consome os dados.',
+        '<strong>B — Errada:</strong> JSON não vem com auréola de segurança. Formato não substitui validação coerente após o parsing.',
+        '<strong>D — Errada:</strong> O header do Envoy informa tempo de upstream. Culpar o balanceador aqui é terceirizar o pecado da aplicação.',
+      ],
+    },
+  ];
+}
+
+function buildQ3() {
+  return [
+    {
+      text: 'No Repeater, um POST para `/admin/user/disable` retorna 403. Ao trocar para GET com os mesmos cookies, CSRF token e cabeçalhos de observabilidade, a ação executa e a conta é desativada. Qual classificação descreve melhor o achado?',
+      opts: [
+        'Verb Tampering combinado com Broken Access Control; a autorização foi amarrada ao método HTTP, não à ação sensível.',
+        'IDOR, porque o mesmo recurso foi acessado por dois verbos diferentes usando a mesma sessão.',
+        'SSRF, pois GET pode ser disparado a partir de links e imagens em páginas de terceiros.',
+        'Race Condition, porque a troca de verbo alterou a ordem interna de validações do endpoint.',
+      ],
+      exp: 'O problema central é controle de acesso vinculado ao verbo HTTP. Se a ação sensível deveria exigir autorização robusta, ela não pode “virar pública” só porque o método mudou. Isso é Verb Tampering em uma superfície de Broken Access Control. Tokens, cabeçalhos e telemetria são barulho lateral; a falha material é a autorização mal desenhada em torno do método, não do efeito da operação.',
+      wrongs: [
+        '<strong>B — Errada:</strong> Não há troca de identificador de recurso alheio; há execução indevida da mesma ação por método alternativo.',
+        '<strong>C — Parcial, mas insuficiente:</strong> O cenário pode facilitar exploração via GET, mas isso descreve vetor de abuso, não a classificação principal do defeito.',
+        '<strong>D — Errada:</strong> Nada no enunciado indica condição de corrida. Só trocar o verbo não cria race condition por decreto.',
+      ],
+    },
+    {
+      text: 'Você envia dois requests idênticos, mudando apenas `userId=4401` para `userId=4402`. Ambos retornam 200, `Content-Length` parecido e JSON válido, mas o Comparer mostra CPF, e-mail e saldo diferentes. Há também `cache-status: BYPASS` e um `request-id` diferente. Qual inferência é a mais forte?',
+      opts: [
+        'Há forte evidência de IDOR, porque a aplicação devolveu dados de outro recurso sem bloquear a troca de identificador.',
+        'A diferença é explicada por cache fragmentado em borda; responses divergentes com IDs diferentes são esperados e não indicam falha.',
+        'Como o `Content-Length` é parecido, o sistema provavelmente aplica padding defensivo e os dados não devem ser reais.',
+        'O `request-id` diferente invalida a comparação, porque cada execução pode retornar payload arbitrário para o mesmo usuário.',
+      ],
+      exp: 'Quando dois requests quase iguais, diferenciados apenas pelo identificador, devolvem dados pessoais distintos com 200 OK, a hipótese forte é IDOR. `cache-status: BYPASS` ainda enfraquece a desculpa de cache. `request-id` diferente é normal por requisição e não anula a comparação. O analista maduro não se impressiona com detalhes cosméticos quando a evidência estrutural já está gritando.',
+      wrongs: [
+        '<strong>B — Errada:</strong> Cache não justifica retorno consistente de dados de outro usuário quando o identificador muda e a borda ainda informa bypass.',
+        '<strong>C — Errada:</strong> Tamanho parecido não neutraliza diferença material de conteúdo. Parecido não é sinônimo de inocente.',
+        '<strong>D — Errada:</strong> IDs de correlação existem justamente para separar requests. Eles não tornam o payload “arbitrário”.',
+      ],
+    },
+    {
+      text: 'Um endpoint aceita `redirect=/dashboard`. No Repeater, você troca para `https://portal-cliente.exemplo.com.evil.tld/login` e o servidor responde 302 normalmente. O response inclui `X-Served-By` e um banner WAF, o que distrai metade da sala. Qual é o risco principal?',
+      opts: [
+        'Open Redirect útil para phishing e encadeamento de ataques, porque a URL começa em domínio confiável e termina levando a vítima para fora.',
+        'Stored XSS, porque qualquer parâmetro de redirect que contenha URL será refletido em JavaScript do front-end.',
+        'SSRF, já que o servidor faz a requisição para o domínio externo antes de instruir o navegador a seguir.',
+        'Command Injection, porque o caractere `:` em `https://` costuma atingir parsing de shell no backend.',
+      ],
+      exp: 'O risco central é Open Redirect. O atacante usa uma URL aparentemente legítima do domínio alvo como primeiro passo e, depois do clique, envia a vítima para o domínio controlado por ele. Em OAuth e fluxos de autenticação, isso ainda pode servir de peça intermediária em cadeias maiores. `X-Served-By` e WAF banner são maquiagem operacional; não mudam o fato de que o servidor aceitou um destino externo arbitrário.',
+      wrongs: [
+        '<strong>B — Errada:</strong> Reflection de URL não vira XSS automaticamente. Falta contexto de execução em HTML/JS.',
+        '<strong>C — Errada:</strong> No redirect clássico o navegador segue a Location; o servidor não está consumindo o recurso remoto como em SSRF.',
+        '<strong>D — Errada:</strong> `https://` em parâmetro de redirect não é shell command. Às vezes o problema é grave sem precisar inventar ficção.',
+      ],
+    },
+    {
+      text: 'Você muda `Content-Type: application/json` para `application/xml` e o endpoint continua respondendo 200. O XML enviado inclui doctype simples, mas ainda sem entidade externa. O ambiente tem APM, Envoy e logs verbosos. Qual superfície de risco você abriu e deve explorar com cautela?',
+      opts: [
+        'Header Smuggling, porque aceitar XML depois de JSON sugere desserialização duplicada entre proxies em cadeia.',
+        'Mass Assignment, porque qualquer parser XML converte automaticamente nós em campos privilegiados do modelo.',
+        'Insecure Direct Object Reference, pois XML costuma mapear IDs internos com menos validação do que JSON.',
+        'XXE, porque um parser XML ativo pode processar entidades externas se estiver mal configurado e atingir arquivos ou serviços internos.',
+      ],
+      exp: 'Se o endpoint aceita XML, há um parser XML ativo. Isso abre a porta para XXE caso o processamento de entidades externas não tenha sido desabilitado corretamente. O próximo passo cauteloso é testar payloads controlados e observar comportamento, sem confundir telemetria com defesa. APM, Envoy e logs verbosos explicam caminho e latência; não substituem análise do parser.',
+      wrongs: [
+        '<strong>A — Errada:</strong> Header smuggling envolve inconsistência de interpretação entre camadas HTTP, não simples aceitação de XML.',
+        '<strong>B — Parcial, mas errada aqui:</strong> Mass assignment é possível em muitos formatos, mas a pista específica de aceitar XML aponta primeiro para XXE.',
+        '<strong>C — Errada:</strong> XML não transforma sozinho um endpoint em IDOR. Faltam evidências de autorização inconsistente sobre identificadores.',
+      ],
+    },
+    {
+      text: 'Um endpoint dito “protegido” retorna 200 com dados resumidos quando você remove totalmente o `Authorization` no Repeater. Há `Cache-Control: no-store`, `cf-cache-status: DYNAMIC` e um HTML bonito de fallback. Qual análise é mais correta?',
+      opts: [
+        'O comportamento é aceitável, porque dados resumidos podem compor uma versão pública da API sem autenticação.',
+        'A presença de `no-store` mostra maturidade suficiente para considerar o endpoint corretamente protegido, ainda que responda 200.',
+        'O HTML de fallback indica erro cosmético de roteamento; o correto é ignorar o 200 e testar apenas requests com token.',
+        'Há falha de autenticação/autorização, porque endpoint protegido não deveria processar e devolver conteúdo útil sem credenciais válidas.',
+      ],
+      exp: 'Se o recurso é protegido por design, remover `Authorization` e ainda receber 200 com conteúdo útil é falha. O detalhe mais perigoso aqui é a normalização do erro: resposta “bonita”, dados resumidos e headers sensatos podem fazer o time achar que está tudo bem. Não está. `no-store` e `cf-cache-status` são boas práticas operacionais, mas não consertam decisão de acesso errada.',
+      wrongs: [
+        '<strong>A — Errada:</strong> Isso só seria aceitável se a versão pública fosse intencional, documentada e distinta. O enunciado fala em endpoint protegido.',
+        '<strong>B — Errada:</strong> Cache bem configurado não absolve autorização ruim. Seria maravilhoso se funcionasse assim; infelizmente não.',
+        '<strong>C — Errada:</strong> O 200 com conteúdo útil é justamente a evidência que não deve ser ignorada.',
+      ],
+    },
+  ];
+}
+
+function buildQ4() {
+  return [
+    {
+      text: 'No mapeamento você encontra `/api/v1/user` e `/api/v2/user`. O v2 devolve `internalId`, `debugMode`, `supportFlags` e um `releaseRing`. No History também aparecem healthchecks e métricas do gateway. Qual interpretação merece prioridade?',
+      opts: [
+        'Campos de debug e flags internas em produção ampliam exposição de informação e podem revelar superfícies administrativas ou comportamentos especiais da aplicação.',
+        'Versões de API coexistindo provam violação de menor privilégio, então o risco principal é arquitetural e independe dos campos retornados.',
+        '`internalId` por si só indica SQL Injection, já que IDs internos geralmente saem diretamente do banco sem sanitização.',
+        'Healthchecks e métricas do gateway mostram que o endpoint está em ambiente de staging, então os campos extras são aceitáveis.',
+      ],
+      exp: 'Campos como `debugMode`, `supportFlags` e `releaseRing` expõem informação operacional que ajuda o atacante a entender caminhos especiais do sistema, feature flags e comportamento diferenciado por perfil. Sozinhos, podem “só” ser information disclosure; combinados com endpoints permissivos, viram atalho para abuso. Healthchecks e métricas de gateway são ruído de contexto. Eles não transformam produção em laboratório licenciado.',
+      wrongs: [
+        '<strong>B — Errada:</strong> Coexistência de versões é comum. O problema não é existir v1 e v2; é o que uma delas expõe e como valida acesso.',
+        '<strong>C — Errada:</strong> `internalId` pode ser disclosure, mas não prova SQL Injection sem evidência de query insegura.',
+        '<strong>D — Errada:</strong> Métricas e healthchecks não autorizam manter flags de debug visíveis. Isso seria uma desculpa criativa, não um controle.',
+      ],
+    },
+    {
+      text: 'Em um SPA você observa `GET /config/bootstrap` devolvendo `apiBase`, `sentryDsn`, `tenantId`, `feature_chat_beta`, `supportPortalUrl` e `adminConsoleHint:false`. Qual ponto de mapeamento é mais valioso antes de correr para explorar o que “soa secreto”?',
+      opts: [
+        'Assumir que `adminConsoleHint` é mentira e procurar brute force de `/admin`, porque hints falsos geralmente protegem rotas reais.',
+        'Concluir que `sentryDsn` é credencial sensível e abrir o report imediatamente como exposição crítica de segredo.',
+        'Tratar o bootstrap como mapa de superfície: enumerar endpoints, tenants, portais e flags associados, separando disclosure útil de falso glamour.',
+        'Ignorar totalmente o arquivo, porque configuração exposta ao front-end jamais traz sinal aproveitável em testes manuais.',
+      ],
+      exp: 'Arquivos bootstrap e config do front-end são ouro para mapeamento: revelam rotas, ambientes, flags, integrações e nomes internos. A postura correta é extrair superfície de ataque e validar o que realmente gera acesso indevido, sem transformar qualquer string em “segredo crítico”. O analista bom não se apaixona por buzzword; ele enumera, prioriza e testa.',
+      wrongs: [
+        '<strong>A — Errada:</strong> Sair para brute force porque um hint apareceu é mais adrenalina do que método.',
+        '<strong>B — Errada:</strong> DSN de observabilidade pode ter sensibilidade limitada, mas chamá-lo automaticamente de segredo crítico costuma ser exagero.',
+        '<strong>D — Errada:</strong> Configuração exposta ao cliente frequentemente entrega contexto valioso de rotas, integrações e features.',
+      ],
+    },
+    {
+      text: 'Você encontra `/health`, `/ready`, `/metrics` e `/actuator/env`. Os três primeiros exigem autenticação fraca; o último responde 403, mas com diferença forte de tamanho e 900 ms extras quando você adiciona `?pattern=db`. Há CDN, mesh e sidecar no caminho. Qual pista merece seguimento?',
+      opts: [
+        'A variação seletiva de tamanho/latência no `/actuator/env` sugere processamento real do parâmetro e justifica investigação controlada, apesar do 403.',
+        'Como o status final é 403, o endpoint já está adequadamente protegido e qualquer diferença observada é irrelevante.',
+        'O sidecar de service mesh costuma introduzir ruído de latência; portanto diferenças abaixo de 2 segundos devem ser descartadas sempre.',
+        'Endpoints de saúde são públicos por natureza operacional, então tentar correlacioná-los com exposição de configuração é perda de tempo.',
+      ],
+      exp: 'Um 403 não encerra a análise quando a resposta muda de forma seletiva conforme o input. Se `?pattern=db` altera tamanho e latência, o servidor provavelmente processou parte da consulta antes de negar o acesso. Isso pode revelar enumeração, filtragem parcial ou vazamento indireto de configuração. CDN, mesh e sidecar adicionam ruído, sim; mas diferença consistente e input-dependent é sinal, não superstição.',
+      wrongs: [
+        '<strong>B — Errada:</strong> Status final sozinho não conta a história inteira. Às vezes o erro já vem depois do estrago informacional.',
+        '<strong>C — Errada:</strong> Latência de infraestrutura existe, porém regra absoluta de “abaixo de 2 segundos ignora” é preguiça com roupa de critério.',
+        '<strong>D — Errada:</strong> Endpoints operacionais não são automaticamente públicos e podem vazar bastante contexto se mal configurados.',
+      ],
+    },
+    {
+      text: 'Em uma rota `/api/search`, o parâmetro `sort` aceita `name`, `date` e, inesperadamente, `internal_score`. Quando você envia valor inválido, o backend devolve stack reduzida com nome da classe e `traceId`. Qual hipótese de mapeamento é mais promissora?',
+      opts: [
+        'A stack reduzida prova RCE iminente, então o melhor próximo passo é tentar payloads de shell no parâmetro `sort`.',
+        'O `traceId` permite correlacionar logs, logo o risco principal é log poisoning, não enumeração de comportamento interno.',
+        'O parâmetro provavelmente alimenta lista de colunas permitidas; descobrir valores internos válidos pode revelar campos sensíveis e caminhos de autorização frouxa.',
+        'Se `internal_score` é aceito, o sistema necessariamente usa machine learning e a rota deixa de ser relevante para segurança web tradicional.',
+      ],
+      exp: 'O parâmetro `sort` parece controlar um conjunto de valores whitelisted. Quando um valor interno como `internal_score` é aceito e erros revelam classes, o caminho mais inteligente é mapear quais campos internos existem e o que eles expõem. Isso pode revelar ranking, flags, colunas de uso administrativo e até decisões de acesso baseadas em score. Tentar shell payload aqui seria pular dez passos por ansiedade.',
+      wrongs: [
+        '<strong>A — Errada:</strong> Stack reduzida não é passe livre para gritar RCE. Às vezes o achado é valioso justamente por ser mais sutil.',
+        '<strong>B — Errada:</strong> `traceId` ajuda correlação, mas o ponto forte aqui é enumeração de comportamento e campos internos aceitos.',
+        '<strong>D — Errada:</strong> Aceitar `internal_score` não muda a categoria da análise; continua sendo segurança de aplicação e controle de parâmetros.',
+      ],
+    },
+    {
+      text: 'Você descobre `/export/report?format=csv`. Valores como `pdf`, `xlsx` e `json` retornam erros distintos; `pdf/../../../etc/passwd` devolve 500 com 2,8 s de atraso, enquanto `pdfAAAA` falha rápido. Há gateway, fila e retry automático no stack. Qual leitura é a mais prudente?',
+      opts: [
+        'A diferença seletiva sugere que o valor é usado em operação de arquivo ou resolução de path; vale aprofundar como possível Path Traversal ou file handling inseguro.',
+        'O atraso maior é claramente causado pela fila, então qualquer relação com o payload é coincidência operacional sem valor diagnóstico.',
+        'Como o response final é 500, a exploração já está confirmada; o próximo passo é reportar LFI crítica sem testes adicionais.',
+        'O parâmetro `format` só controla conversão de relatório e nunca deveria influenciar acesso a arquivos do host, portanto o cenário é falso positivo.',
+      ],
+      exp: 'Diferença consistente de latência e tipo de erro em payload específico de path é forte pista de que o valor chegou a uma operação real de arquivo antes de falhar. Isso não fecha o achado sozinho, mas justifica aprofundar como Path Traversal, LFI ou file handling inseguro. Gateway, fila e retry adicionam ruído, porém ruído não costuma variar tão bem com um payload específico se o backend nem o tocasse.',
+      wrongs: [
+        '<strong>B — Errada:</strong> Infraestrutura gera jitter, mas quando o atraso acompanha precisamente um padrão de input, ignorá-lo é perder o fio da meada.',
+        '<strong>C — Errada:</strong> Reportar “LFI crítica” nessa fase seria entusiasmo precoce. Falta confirmar leitura controlada e impacto real.',
+        '<strong>D — Errada:</strong> O fato de um parâmetro “não dever” influenciar arquivo não impede que influencie. Segurança vive exatamente desse tipo de contradição.',
+      ],
+    },
+  ];
+}
+
+function buildQ5() {
+  return [
+    {
+      text: 'No checkout, enviar `quantity=-1` produz total negativo e mensagem de sucesso. O request ainda traz `promoCode`, `traceId` e headers do antifraude. Qual classificação e impacto representam melhor o caso?',
+      opts: [
+        'SQL Injection de baixa severidade, porque o número negativo provavelmente corrompe a query de cálculo do carrinho.',
+        'Business Logic Flaw com impacto financeiro real, pois a aplicação aceita estado impossível de compra e altera o valor cobrado.',
+        'CSRF refletido, já que o browser poderia repetir o request negativo a partir de uma página externa.',
+        'DoS lógico, porque valores negativos tendem a travar o mecanismo de antifraude antes da autorização de pagamento.',
+      ],
+      exp: 'O defeito é de lógica de negócio: a aplicação aceita uma quantidade impossível e usa esse valor no cálculo final, gerando cobrança incorreta. O impacto é financeiro e operacional, não meramente cosmético. `traceId`, antifraude e promoCode são elementos de cenário, mas não explicam o coração do problema. Quando o sistema aceita comprar “menos um” item, não é SQLi; é validação de regra de negócio em frangalhos.',
+      wrongs: [
+        '<strong>A — Errada:</strong> Nada indica injeção em query. Número negativo errado não vira SQLi por osmose.',
+        '<strong>C — Errada:</strong> CSRF pode ser vetor em alguns fluxos, mas a falha descrita continua sendo a regra de negócio quebrada.',
+        '<strong>D — Errada:</strong> Pode haver efeito operacional no antifraude, mas o impacto primário já está no cálculo do preço e na possibilidade de abuso financeiro.',
+      ],
+    },
+    {
+      text: 'Uma função “esqueci minha senha” informa “usuário não encontrado” para e-mails inexistentes e “token enviado” para contas válidas. Há CAPTCHA opcional, logs de auditoria e integração com e-mail transacional. Qual severidade inicial é mais justa?',
+      opts: [
+        'Informational, porque sem takeover direto não existe impacto material de segurança.',
+        'Critical, porque qualquer enumeração de usuário em autenticação equivale a comprometimento total de conta.',
+        'Low ou Medium conforme contexto, pois a enumeração facilita ataques posteriores, mas o impacto depende de exposição, rate limit e população de usuários.',
+        'None, já que o CAPTCHA opcional reduz a automação e transforma o comportamento em requisito aceitável de UX.',
+      ],
+      exp: 'A enumeração de contas em fluxo de reset não é irrelevante, mas também não deve ser inflada artificialmente. A severidade costuma ficar entre Low e Medium, dependendo de fatores como possibilidade de automação, criticidade da base de usuários, presença de rate limit, MFA, e se o produto permite pivot para phishing ou credential stuffing mais eficiente. Segurança madura gosta de contexto; gritar “critical” para tudo só treina o time a não te levar a sério.',
+      wrongs: [
+        '<strong>A — Errada:</strong> Não haver takeover imediato não elimina impacto. Enumeração ajuda ataques subsequentes e inteligência de alvo.',
+        '<strong>B — Errada:</strong> Há risco, mas igualar enumeração a comprometimento total de conta é exagero técnico.',
+        '<strong>D — Errada:</strong> CAPTCHA opcional ajuda pouco contra atores determinados e não transforma o comportamento em aceitável por definição.',
+      ],
+    },
+    {
+      text: 'Um endpoint de upload aceita `.jpg` e `.png`, mas também processa `avatar.jpg.php` se o `Content-Type` for `image/jpeg`. O servidor salva em bucket privado e devolve URL assinada temporária. Qual leitura é mais forte?',
+      opts: [
+        'É falso positivo, porque bucket privado neutraliza qualquer risco associado ao upload de arquivo duplo.',
+        'Há falha de validação de upload; mesmo sem execução imediata, aceitar extensão dupla pode abrir caminho para abuso conforme pipeline, proxy ou serviço que consumir o arquivo.',
+        'O problema é apenas de naming convention, já que a URL assinada garante que o arquivo nunca será interpretado por nenhum componente.',
+        'Trata-se de XXE, porque upload com `Content-Type` controlado pelo cliente permite parser de imagem resolver entidades externas.',
+      ],
+      exp: 'Aceitar extensão dupla em upload indica validação fraca. Mesmo que o bucket atual seja privado, o risco pode emergir em qualquer etapa posterior: antivírus, thumbnailer, CDN, job de processamento, migração de storage ou serviço que interprete nome/extensão de forma diferente. Segurança boa pensa no pipeline inteiro, não só no primeiro storage. A URL assinada reduz exposição direta, mas não absolve o backend de aceitar um artefato ambíguo.',
+      wrongs: [
+        '<strong>A — Errada:</strong> Bucket privado reduz superfície imediata, porém não elimina risco futuro no pipeline do arquivo.',
+        '<strong>C — Errada:</strong> URL assinada controla acesso, não a forma como outros componentes interpretarão o artefato armazenado.',
+        '<strong>D — Errada:</strong> Não há indício de XML nem entidade externa. Nem todo parser controlado pelo cliente vira XXE.',
+      ],
+    },
+    {
+      text: 'Em uma área autenticada, o usuário pode alterar o parâmetro `discountCode` no request final de pagamento. Códigos expirados retornam “inválido”, mas um código interno de teste `QA-100` zera a cobrança em produção. Há feature flags e `releaseRing=pilot` no bootstrap. Qual conclusão é mais adequada?',
+      opts: [
+        'É um hardcoded secret sem impacto financeiro, porque códigos promocionais pertencem ao domínio comercial e não ao de segurança.',
+        'É uma simples falha de configuração de ambiente, então o time de segurança só deveria observar e não classificar como vulnerabilidade.',
+        'Como existe `releaseRing=pilot`, o comportamento é esperado para usuários experimentais e não deve ser reportado até nova validação.',
+        'Há falha de lógica/autorização comercial, com impacto financeiro concreto, pois um código interno de teste ativo em produção altera preço de forma indevida.',
+      ],
+      exp: 'Quando um código interno de teste permanece ativo em produção e concede desconto total sem autorização adequada, o problema é claro: falha de lógica com impacto financeiro real. Feature flags e `releaseRing` são contexto útil, mas não desculpam deixar um atalho interno aberto para usuários comuns. O comportamento altera preço de forma não prevista pelo negócio e pode ser abusado em escala.',
+      wrongs: [
+        '<strong>A — Errada:</strong> Impacto financeiro em fluxo de cobrança é absolutamente tema de segurança quando decorre de controle quebrado.',
+        '<strong>B — Errada:</strong> Mesmo que a origem seja configuração ruim, o efeito é vulnerabilidade explorável. Segurança não terceiriza o impacto porque nasceu em outro time.',
+        '<strong>C — Errada:</strong> `releaseRing` pode explicar experimentos, mas não autoriza zeraço de cobrança para qualquer usuário sem regra clara.',
+      ],
+    },
+    {
+      text: 'Um endpoint interno de relatório aceita `reportId` e retorna PDF. Trocando para um ID de outro cliente, o sistema responde 403. Porém, quando você altera `Accept: text/html`, recebe uma página de erro contendo nome da empresa, período do relatório e número parcial do contrato. Há SSO, gateway e página branca customizada. O que isso representa?',
+      opts: [
+        'Nenhum achado relevante, porque o controle principal bloqueou o PDF e dados na página de erro não contam como exposição real.',
+        'Apenas um problema de UX: a página de erro está verbosa demais, mas não há implicação de segurança reportável.',
+        'Baixa relevância, já que exposição parcial em erro só importa quando o contrato completo é revelado com todos os dígitos.',
+        'Information Disclosure por tratamento inconsistente de erro; o recurso foi bloqueado, mas metadata sensível vazou na resposta alternativa.',
+      ],
+      exp: 'Mesmo com o PDF protegido, a resposta alternativa em HTML está vazando metadados sensíveis de outro cliente. Isso é Information Disclosure por tratamento inconsistente de erro. Não é o mesmo impacto de baixar o relatório inteiro, mas continua sendo vulnerabilidade: nome de empresa, período e contrato parcial já ajudam enumeração, engenharia social e validação de alvos. Segurança séria não mede vazamento só em “arquivo completo ou nada”.',
+      wrongs: [
+        '<strong>A — Errada:</strong> Bloquear o artefato principal não apaga o vazamento lateral. O erro ainda está entregando dado que não deveria.',
+        '<strong>B — Errada:</strong> UX ruim pode coexistir com falha de segurança. Aqui coexiste mesmo.',
+        '<strong>C — Errada:</strong> Exposição parcial também tem valor ofensivo. Nem todo dano chega embalado em dump completo.',
+      ],
+    },
+  ];
+}
+
+function buildQ6() {
+  return [
+    {
+      text: 'Você acessa `GET /api/order/5500` com sessão do usuário 5500 e recebe 200. Trocando para `5501`, também recebe 200 com dados completos, mas a empresa usa conta família e pedidos delegados. Antes de carimbar IDOR, qual passo tem melhor custo-benefício?',
+      opts: [
+        'Testar IDs aleatórios até o limite e, se dois funcionarem, concluir que a autorização inexiste para todos os pedidos.',
+        'Comparar apenas `Content-Length`, porque diferença de tamanho basta para afastar qualquer relação legítima entre os recursos.',
+        'Verificar se existe relação de negócio autorizada entre o usuário atual e o pedido acessado, como vínculo familiar, corporativo ou compartilhamento explícito.',
+        'Reportar imediatamente com severidade alta, já que qualquer 200 em ID diferente já encerra a investigação.',
+      ],
+      exp: 'O passo mais maduro é validar contexto de negócio. Há sistemas em que um usuário realmente pode ver recursos de familiares, empresa ou contas vinculadas. Dois responses 200 com IDs diferentes são sinal forte, mas confirmação de IDOR exige verificar se o acesso é indevido de fato. O analista profissional não confunde evidência forte com sentença final sem contexto.',
+      wrongs: [
+        '<strong>A — Errada:</strong> Escalar enumeração antes de validar o modelo de negócio aumenta ruído e risco sem resolver a pergunta principal.',
+        '<strong>B — Errada:</strong> `Content-Length` ajuda comparação, mas não responde se o acesso é legítimo ou não.',
+        '<strong>D — Errada:</strong> Reportar cedo demais pode gerar falso positivo e corroer sua credibilidade. O bug continua feio; a análise é que não deve ser preguiçosa.',
+      ],
+    },
+    {
+      text: 'Em um IDOR confirmado, o JSON de outro usuário retorna `internalScore`, `fraudTier`, `collectionStage` e `notesPreview`. O desenvolvedor diz que “o front ignora esses campos”. Qual resposta técnica é a mais forte?',
+      opts: [
+        'Se o front ignora, o risco cai para informacional, porque dado não renderizado não compõe superfície prática de ataque.',
+        'Campos ignorados pelo front continuam sendo exposição de dado e podem apoiar fraude, discriminação de alvo, engenharia social e priorização ofensiva.',
+        'A presença de `internalScore` prova uso de IA, então o report deve migrar para categoria algorítmica e não mais de API.',
+        'O problema real deixa de ser IDOR e vira apenas excesso de logging, já que os campos internos parecem diagnósticos.',
+      ],
+      exp: 'Campo exposto em response já é campo exposto — pouco importa se o front escolhe renderizar ou não. `internalScore`, `fraudTier`, `collectionStage` e notas resumidas agregam inteligência operacional valiosa ao atacante e elevam impacto do IDOR. O argumento “o front ignora” é confortável para quem quer minimizar o problema, mas não muda a realidade de que o cliente recebeu dados que não deveria possuir.',
+      wrongs: [
+        '<strong>A — Errada:</strong> O dado não precisa aparecer bonito na tela para ter utilidade ofensiva. Basta estar no payload.',
+        '<strong>C — Errada:</strong> Categoria do achado continua sendo exposição indevida via API. IA no cenário não reinventa o tipo de falha.',
+        '<strong>D — Errada:</strong> Logging excessivo e IDOR podem coexistir, mas o centro do problema continua sendo acesso indevido a dado alheio.',
+      ],
+    },
+    {
+      text: 'Você troca o e-mail de recuperação para `victim@empresa.com`, mas o sistema responde sempre “solicitação registrada”. No entanto, requests para contas válidas geram 202 ms a mais, um `messageId` no response e um callback para serviço de notificação. Há fila assíncrona e retry. Qual leitura inicial é mais responsável?',
+      opts: [
+        'É seguro por design, porque mensagem uniforme na interface elimina qualquer possibilidade de enumeração.',
+        'Diferença temporal e callback isolados já bastam para classificar como critical account takeover.',
+        'A fila assíncrona introduz latência variável; portanto qualquer diferença de tempo invalida totalmente a hipótese de enumeração.',
+        'Há possível enumeração lateral por side-channel; vale repetir testes controlados, reduzir ruído e confirmar consistência antes de fechar o achado.',
+      ],
+      exp: 'Mensagem uniforme no front é bom começo, mas side-channels ainda podem trair a existência da conta. Se contas válidas geram `messageId`, callback e latência adicional consistente, existe hipótese séria de enumeração lateral. Como há fila e retry, a postura correta é controlar variáveis, repetir medições e confirmar padrão antes de classificar. Nem negar tudo, nem gritar takeover por reflexo.',
+      wrongs: [
+        '<strong>A — Errada:</strong> Uniformidade de mensagem não elimina side-channel em backend, e-mail ou telemetria.',
+        '<strong>B — Errada:</strong> Há sinal de enumeração, não de takeover crítico automático. Pular etapas só deixa o report espalhafatoso.',
+        '<strong>C — Errada:</strong> Infra assíncrona adiciona ruído, mas não torna impossível observar padrão consistente. Senão ninguém mediria nada nunca.',
+      ],
+    },
+    {
+      text: 'Você testa um endpoint GraphQL. Erros de autorização retornam `errors:[{message:"forbidden"}]`, mas, quando usa um alias específico, o response ainda inclui `extensions.debug.module="billing-admin"`. O time alega que isso é “só metadado”. Como você avalia?',
+      opts: [
+        'Sem dados de negócio no payload, metadado de módulo interno jamais deve ser reportado como exposição.',
+        'Como GraphQL costuma ser verboso, `extensions.debug` é esperado e só importa em ambiente de desenvolvimento local.',
+        'É information disclosure útil, porque nome de módulo interno e contexto administrativo ajudam enumeração de superfície e priorização de ataque.',
+        'A presença de alias muda a natureza do protocolo e transforma a falha em injection de query estruturada.',
+      ],
+      exp: 'Metadados em `extensions` podem parecer inocentes, mas nomes de módulos internos, especialmente algo como `billing-admin`, revelam arquitetura, domínios sensíveis e possíveis alvos prioritários. Em GraphQL, esse tipo de vazamento ajuda bastante na enumeração de operações e superfícies administrativas. Não é o fim do mundo sozinho, mas é disclosure útil e reportável quando entregue indevidamente.',
+      wrongs: [
+        '<strong>A — Errada:</strong> Exposure de contexto interno continua sendo exposure, mesmo sem dado de negócio completo.',
+        '<strong>B — Errada:</strong> Verbosidade do protocolo não autoriza vazar nomes de módulos administrativos em produção.',
+        '<strong>D — Errada:</strong> Alias é recurso legítimo de GraphQL. Seu uso não “transforma” o achado em injection por mágica.',
+      ],
+    },
+    {
+      text: 'Na fase final, você junta um price tampering, um IDOR confirmado e uma enumeração lateral ainda em validação. O gestor pede um resumo executivo “sem drama, mas sem anestesia”. Qual priorização comunica melhor risco real?',
+      opts: [
+        'Abrir tudo como critical, porque uniformizar para cima acelera correção e evita discussão de severidade.',
+        'Relatar apenas o IDOR, já que múltiplos achados no mesmo fluxo confundem stakeholders não técnicos.',
+        'Separar por evidência: IDOR confirmado e manipulação de preço com impacto financeiro como prioridades, enumeração lateral como achado pendente de confirmação contextual.',
+        'Fundir tudo em um único achado chamado “segurança fraca no fluxo” para deixar o reporte mais executivo e menos detalhado.',
+      ],
+      exp: 'Comunicação premium não é inflar nem esconder: é separar o que está confirmado, qual impacto já foi demonstrado e o que ainda depende de validação adicional. IDOR confirmado e manipulação de preço com impacto financeiro merecem destaque imediato. A enumeração lateral pode entrar como achado em investigação ou de menor confiança, sem ser apagada. Esse tipo de honestidade técnica aumenta a chance de o time confiar em você na próxima vez.',
+      wrongs: [
+        '<strong>A — Errada:</strong> Inflar tudo para critical não é estratégia; é imposto sobre a confiança futura do seu próprio report.',
+        '<strong>B — Errada:</strong> Omitir achados por medo de “confundir” reduz valor do trabalho. O segredo é organizar, não amputar.',
+        '<strong>D — Errada:</strong> Fundir tudo em uma sopa genérica destrói rastreabilidade e dificulta correção por equipes diferentes.',
+      ],
+    },
+  ];
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER ENGINE
+// ═══════════════════════════════════════════════════════════
+function renderNav() {
+  const nav = document.getElementById('nav-chapters');
+  nav.innerHTML = '';
+  CHAPTERS.forEach((ch, i) => {
+    const cs = state.chapters[i];
+    const isActive = state.currentChapter === i;
+    const isLocked = !cs.unlocked;
+    const isDone = cs.complete;
+    const div = document.createElement('div');
+    div.className = `nav-ch-item ${isActive?'active':''} ${isLocked?'locked':''} ${isDone?'done':''}`;
+    div.onclick = () => { if (!isLocked) goToChapter(i); };
+    div.innerHTML = `
+      <div class="ch-icon">${isDone ? '✓' : isLocked ? '🔒' : (i+1)}</div>
+      <div class="ch-info">
+        <div class="ch-num">Capítulo ${String(i+1).padStart(2,'0')}</div>
+        <div class="ch-name">${ch.title}</div>
+      </div>
+    `;
+    nav.appendChild(div);
+  });
+  const pct = getProgress();
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function goToChapter(idx) {
+  state.currentChapter = idx;
+  saveState();
+  renderNav();
+  document.querySelectorAll('.chapter-view').forEach(v => v.classList.remove('active'));
+  document.getElementById(`chapter-${idx}`).classList.add('active');
+  document.getElementById('header-title').textContent = CHAPTERS[idx].title;
+  window.scrollTo(0,0);
+  bindBurpTabs();
+}
+
+function acceptSaveNotice() {
+  state.consent = true;
+  saveState();
+  refreshSaveNotice();
+}
+
+function refreshSaveNotice() {
+  const box = document.getElementById('save-notice-box');
+  const btn = document.getElementById('save-notice-btn');
+  if (!box) return;
+  if (state.consent) {
+    box.classList.add('ok');
+    box.innerHTML = '<strong>Salvar progresso</strong>O progresso está habilitado neste navegador e é salvo automaticamente quando você seleciona ou confirma respostas, conclui labs, valida leitura e troca de capítulo. Ele não acompanha modo anônimo, limpeza de cache/dados do site, troca de navegador ou de dispositivo.';
+  } else if (btn) {
+    btn.disabled = false;
+  }
+}
+
+function rebuildChapter(idx) {
+  const current = document.getElementById(`chapter-${idx}`);
+  if (!current) return;
+  const replacement = buildChapterDOM(idx);
+  current.replaceWith(replacement);
+}
+
+function updateChapterUI(idx) {
+  const cs = state.chapters[idx];
+  const banner = document.getElementById(`ch-banner-${idx}`);
+  const scoreEl = document.getElementById(`ch-score-${idx}`);
+  const nextBtn = document.getElementById(`ch-next-btn-${idx}`);
+  const gate = document.getElementById(`read-gate-${idx}`);
+  const status = document.getElementById(`read-status-${idx}`);
+  if (scoreEl) scoreEl.innerHTML = `Pontuação: <span>${cs.score}</span>/5 (mínimo: ${CHAPTERS[idx].minScore})`;
+
+  if (cs.complete && banner) {
+    banner.classList.add('show');
+    if (nextBtn) nextBtn.disabled = false;
+  }
+}
+
+function buildChapterDOM(idx) {
+  const ch = CHAPTERS[idx];
+  const cs = state.chapters[idx];
+
+  const div = document.createElement('div');
+  div.id = `chapter-${idx}`;
+  div.className = 'chapter-view';
+
+  if (!cs.unlocked) {
+    div.innerHTML = `
+      <div class="pdf-page">
+        <div class="pdf-page-header">
+          <div class="pdf-page-header-left">
+            <span class="pdf-brand">Be Safe</span>
+            <span class="pdf-chapter-label">Mini Curso — Burp Suite Community</span>
+            <span class="pdf-chapter-title">Capítulo Bloqueado</span>
+          </div>
+          <span class="pdf-page-num">—</span>
+        </div>
+        <div class="locked-overlay"><div class="locked-icon">🔒</div><div class="locked-title">Capítulo Bloqueado</div><div class="locked-sub">Conclua o capítulo anterior para desbloquear este conteúdo.</div></div>
+        <div class="pdf-page-footer">
+          <span class="pdf-footer-brand">Be Safe — Mariana BS · Cybersecurity</span>
+          <span class="pdf-footer-info">Mini Curso · Burp Suite Community · 2026</span>
+        </div>
+      </div>`;
+    return div;
+  }
+
+  const _pageHeader = `<div class="pdf-page-header"><div class="pdf-page-header-left"><span class="pdf-brand">Be Safe</span><span class="pdf-chapter-label">${ch.tag}</span><span class="pdf-chapter-title">${ch.title}</span></div><span class="pdf-page-num">Cap. ${idx + 1} / ${CHAPTERS.length}</span></div>`;
+
+  div.innerHTML = '<div class="pdf-page">' + _pageHeader + '<div class="pdf-page-body">' + ch.content();
+
+  div.innerHTML += ch.lab();
+  div.innerHTML += buildQuestionsDOM(idx);
+  div.innerHTML += '</div>'; /* close pdf-page-body */
+
+  const isLast = idx === CHAPTERS.length - 1;
+  div.innerHTML += `
+  <div class="ch-complete-banner" id="ch-banner-${idx}">
+    <div class="banner-icon">🎉</div>
+    <div class="banner-text">
+      <div class="banner-title">Capítulo ${idx+1} Concluído!</div>
+      <div class="banner-sub">${isLast ? 'Curso completo! Agora sim você pode gerar o certificado.' : 'O próximo capítulo foi desbloqueado. Sem pular etapa, por favor.'}</div>
+    </div>
+  </div>
+  <div class="chapter-footer">
+    <div class="chapter-score" id="ch-score-${idx}">Pontuação: <span>${cs.score}</span>/5 (mínimo: ${ch.minScore})</div>
+    ${isLast
+      ? `<button class="btn btn-primary" id="ch-next-btn-${idx}" onclick="goToCompletion()" ${cs.complete?'':'disabled'}>🏆 Ver Certificado</button>`
+      : `<button class="btn btn-primary" id="ch-next-btn-${idx}" onclick="goToChapter(${idx+1})" ${cs.complete?'':'disabled'}>Próximo Capítulo →</button>`
+    }
+  </div>
+  <div class="pdf-page-footer"><span class="pdf-footer-brand">Be Safe — Mariana BS · Cybersecurity</span><span class="pdf-footer-info">Mini Curso · Burp Suite Community · 2026</span></div>
+  </div>`;
+
+  setTimeout(() => updateChapterUI(idx), 50);
+  return div;
+}
+
+function buildQuestionsDOM(idx) {
+  const qs = CHAPTERS[idx].questions();
+  const cs = state.chapters[idx];
+  let html = `<div class="questions-section">
+    <div class="questions-header">📋 Questões do Capítulo</div>
+    <div class="questions-sub">5 questões técnicas com pegadinha plausível. Mínimo ${CHAPTERS[idx].minScore} acertos para avançar. Aqui a resposta certa não vem com plaquinha.</div>
+    <div class="questions-actions">
+      <div class="questions-actions-meta">Você pode refazer as questões deste capítulo a qualquer momento. Isso zera a pontuação dele e exige nova validação.</div>
+      <button class="btn btn-secondary" onclick="resetChapterQuestions(${idx})">↺ Refazer questões</button>
+    </div>
+    <div class="score-bar">
+      <div><div class="score-val" id="q-score-${idx}">${cs.score}</div><div class="score-label">Acertos</div></div>
+      <div class="score-min">Mínimo: <span>${CHAPTERS[idx].minScore}</span> de ${qs.length}</div>
+    </div>`;
+
+  qs.forEach((q, qi) => {
+    html += renderQuestionCard(idx, qi, q);
+  });
+
+  html += `</div>`;
+  return html;
+}
+
+function renderQuestionCard(cidx, qidx, q) {
+  const cs = state.chapters[cidx];
+  const answered = cs.answers[qidx] !== undefined;
+  const userAnswer = cs.answers[qidx];
+  const pendingAnswer = Array.isArray(cs.pendingAnswers) ? cs.pendingAnswers[qidx] : undefined;
+  const correct = _gx(cidx, qidx);
+  const letters = ['A','B','C','D'];
+  const order = _ord(cidx, qidx, q.opts.length);
+
+  let html = `<div class="question-card ${answered?(userAnswer===correct?'answered-correct':'answered-wrong'):''}" id="qcard-${cidx}-${qidx}" data-chapter="${cidx}" data-question="${qidx}">
+      <div class="q-header"><div class="q-num">Q${qidx+1}</div><div class="q-text">${q.text}</div></div>
+      <div class="q-options">`;
+
+  order.forEach((originalIndex, displayIndex) => {
+    const letter = letters[displayIndex] || String(displayIndex + 1);
+    const opt = q.opts[originalIndex];
+    const selectedClass = !answered && pendingAnswer === originalIndex ? 'selected' : '';
+    const answerClass = answered && userAnswer === originalIndex ? (originalIndex === correct ? 'correct' : 'wrong') : '';
+    const revealCorrectClass = answered && originalIndex === correct && userAnswer !== originalIndex ? 'correct' : '';
+    html += `<div class="q-option ${selectedClass} ${answerClass} ${revealCorrectClass} ${answered?'disabled':''}" ${answered?'':`onclick="pickAnswer(${cidx},${qidx},${originalIndex})"`} data-original-index="${originalIndex}" data-display-index="${displayIndex}">
+      <div class="q-letter">${letter}</div>
+      <div>${opt}</div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  if (answered) {
+    html += buildFeedback(cidx, qidx, userAnswer === correct, q);
+  } else {
+    html += `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0 20px 16px;">
+      <button class="btn btn-accent2" id="qconfirm-${cidx}-${qidx}" onclick="confirmAnswer(${cidx},${qidx})" ${pendingAnswer !== undefined ? '' : 'disabled'}>Confirmar resposta</button>
+      <button class="btn btn-secondary" onclick="clearPendingAnswer(${cidx},${qidx})" ${pendingAnswer !== undefined ? '' : 'disabled'}>Limpar seleção</button>
+      <span style="font-size:12px;color:var(--text3);font-family:var(--mono);">${pendingAnswer !== undefined ? `Selecionada: ${_dispLetter(cidx, qidx, pendingAnswer)}` : 'Selecione uma alternativa antes de confirmar'}</span>
+    </div><div class="q-feedback" id="qfb-${cidx}-${qidx}"></div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function buildFeedback(idx, qi, isCorrect, q) {
+  const wrongs = q.wrongs || [];
+  return `<div class="q-feedback show">
+    <div class="q-feedback-result ${isCorrect?'correct':'wrong'}">${isCorrect ? '✓ Correto' : '✗ Incorreto'}</div>
+    <div class="q-feedback-exp">
+      <strong>Leitura técnica do cenário:</strong><br>${q.exp}<br><br><strong>Por que as demais seduzem, mas falham:</strong>
+      ${wrongs.length ? `<ul class="why-wrong" style="margin-top:12px;padding-left:16px;">${wrongs.map(w=>`<li style="margin:6px 0;font-size:13px;">${w}</li>`).join('')}</ul>` : ''}
+    </div>
+  </div>`;
+}
+
+function pickAnswer(cidx, qidx, originalIndex) {
+  const cs = state.chapters[cidx];
+  if (cs.answers[qidx] !== undefined) return;
+  if (!Array.isArray(cs.pendingAnswers)) cs.pendingAnswers = [];
+  cs.pendingAnswers[qidx] = Number(originalIndex);
+  saveState();
+  rebuildQuestionCard(cidx, qidx);
+}
+
+function clearPendingAnswer(cidx, qidx) {
+  const cs = state.chapters[cidx];
+  if (cs.answers[qidx] !== undefined) return;
+  if (!Array.isArray(cs.pendingAnswers)) cs.pendingAnswers = [];
+  cs.pendingAnswers[qidx] = undefined;
+  saveState();
+  rebuildQuestionCard(cidx, qidx);
+}
+
+function confirmAnswer(cidx, qidx) {
+  const cs = state.chapters[cidx];
+  if (cs.answers[qidx] !== undefined) return;
+  if (!Array.isArray(cs.pendingAnswers)) cs.pendingAnswers = [];
+  const choice = cs.pendingAnswers[qidx];
+  if (choice === undefined || choice === null || Number.isNaN(Number(choice))) return;
+
+  cs.answers[qidx] = Number(choice);
+  cs.pendingAnswers[qidx] = undefined;
+  const correct = _gx(cidx, qidx);
+  if (Number(choice) === correct) cs.score = (cs.score || 0) + 1;
+
+  const scoreEl = document.getElementById(`q-score-${cidx}`);
+  if (scoreEl) scoreEl.textContent = String(cs.score || 0);
+
+  rebuildQuestionCard(cidx, qidx);
+
+  const totalQuestions = CHAPTERS[cidx].questions().length;
+  const allAnswered = cs.answers.filter(a => a !== undefined).length === totalQuestions;
+  if (allAnswered) {
+    checkChapterComplete(cidx);
+  }
+
+  saveState();
+  updateChapterUI(cidx);
+}
+
+function rebuildQuestionCard(cidx, qidx) {
+  const container = document.getElementById(`qcard-${cidx}-${qidx}`);
+  if (!container) return;
+  const qs = CHAPTERS[cidx].questions();
+  container.outerHTML = renderQuestionCard(cidx, qidx, qs[qidx]);
+}
+
+function resetChapterQuestions(idx) {
+  const cs = state.chapters[idx];
+  const totalQuestions = CHAPTERS[idx].questions().length;
+  cs.answers = new Array(totalQuestions);
+  cs.pendingAnswers = new Array(totalQuestions);
+  cs.score = 0;
+  cs.complete = false;
+
+  if (idx + 1 < CHAPTERS.length && !state.chapters[idx + 1].complete) {
+    state.chapters[idx + 1].unlocked = false;
+    rebuildChapter(idx + 1);
+  }
+
+  rebuildChapter(idx);
+  saveState();
+  renderNav();
+  updateChapterUI(idx);
+  goToChapter(idx);
+}
+
+function checkChapterComplete(idx) {
+  const cs = state.chapters[idx];
+  const totalQuestions = CHAPTERS[idx].questions().length;
+  const allAnswered = cs.answers.filter(a => a !== undefined).length === totalQuestions;
+  const labDone = cs.labDone;
+  const minScore = CHAPTERS[idx].minScore;
+  const readDone = true;
+
+  if (allAnswered && labDone && readDone && cs.score >= minScore && !cs.complete) {
+    cs.complete = true;
+    if (idx + 1 < CHAPTERS.length) {
+      state.chapters[idx + 1].unlocked = true;
+      rebuildChapter(idx + 1);
+    }
+    saveState();
+    renderNav();
+    updateChapterUI(idx);
+  }
+}
+
+function markLabDone(idx) {
+  state.chapters[idx].labDone = true;
+  saveState();
+  checkChapterComplete(idx);
+  updateChapterUI(idx);
+}
+
+// ── LAB RUNNERS ──
+function runLab1() {
+  const req = document.getElementById('lab1-request').innerText || document.getElementById('lab1-request').textContent;
+  const fb = document.getElementById('lab1-feedback');
+  const resp = document.getElementById('lab1-response');
+
+  if (req.includes('role=admin')) {
+    resp.innerHTML = `<span class="http-200">HTTP/1.1 200 OK</span>
+<span class="http-header-name">Content-Type:</span> <span class="http-value">application/json</span>
+
+<span class="http-value">{"status":"ok","message":"Login bem-sucedido","user":"analista","role":"admin","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."}</span>`;
+    fb.className = 'lab-feedback show success';
+    fb.innerHTML = '<strong>✓ Lab Concluído!</strong> O servidor aceitou o parâmetro <code>role=admin</code> sem validação server-side. Esta é uma falha de Mass Assignment / Privilege Escalation clássica — o servidor confiou cegamente em um campo controlado pelo cliente. Em um sistema seguro, o papel do usuário nunca deveria ser aceito diretamente do request de login.';
+    document.getElementById('lab1-status').className = 'lab-status complete';
+    document.getElementById('lab1-status').textContent = '✓ Concluído';
+    markLabDone(0);
+  } else {
+    resp.innerHTML = `<span class="http-403">HTTP/1.1 403 Forbidden</span>\n<span class="http-value">{"error":"Parâmetro role inválido ou credenciais insuficientes."}</span>`;
+    fb.className = 'lab-feedback show fail';
+    fb.innerHTML = 'O servidor rejeitou o request. <strong>Dica:</strong> Altere o valor do parâmetro <code>role</code> no body do request para <code>admin</code> antes de enviar.';
+  }
+}
+
+function resetLab1() {
+  const req = document.getElementById('lab1-request');
+  req.innerHTML = `<span class="http-method">POST</span> <span class="http-path">/api/auth/login</span> <span class="http-version">HTTP/1.1</span>
+<span class="http-header-name">Host:</span> <span class="http-host">app.target.lab</span>
+<span class="http-header-name">X-Request-ID:</span> <span class="http-value">9f8a21c2</span>
+<span class="http-header-name">X-Feature-Flag:</span> <span class="http-value">new-auth-flow</span>
+<span class="http-header-name">X-Envoy-External-Address:</span> <span class="http-value">177.54.22.11</span>
+<span class="http-header-name">Content-Type:</span> <span class="http-value">application/x-www-form-urlencoded</span>
+<span class="http-header-name">Cookie:</span> <span class="http-value">session=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9</span>
+
+<span class="http-body-param">username=analista&amp;password=S3cur3Pass!&amp;role=user&amp;userRole=basic&amp;access_level=1&amp;beta=true</span>`;
+  document.getElementById('lab1-response').textContent = 'Aguardando envio...';
+  document.getElementById('lab1-feedback').className = 'lab-feedback';
+}
+
+function runLab2() {
+  const val = document.querySelector('input[name="lab2q"]:checked');
+  const fb = document.getElementById('lab2-feedback');
+  if (!val) { fb.className='lab-feedback show fail'; fb.innerHTML='Selecione uma opção antes de confirmar.'; return; }
+  if (val.value === 'c') {
+    fb.className = 'lab-feedback show success';
+    fb.innerHTML = '<strong>✓ Correto!</strong> O cookie <code>userRole</code> expõe o papel do usuário em texto claro, sem <code>HttpOnly</code> (acessível via JS) nem <code>Secure</code> (pode vazar via HTTP). Além disso, um cookie chamado <code>userRole</code> que contém o papel do usuário é um convite para manipulação client-side. O sessionId tem Secure, mas não tem HttpOnly. Ambos os cookies têm problemas, mas userRole é o mais crítico pelo conjunto de falhas.';
+    document.getElementById('lab2-status').className = 'lab-status complete';
+    document.getElementById('lab2-status').textContent = '✓ Concluído';
+    markLabDone(1);
+  } else {
+    fb.className = 'lab-feedback show fail';
+    fb.innerHTML = 'Análise incompleta. <strong>Dica:</strong> Examine todos os atributos de ambos os cookies. Um deles expõe o papel do usuário sem nenhuma proteção.';
+  }
+}
+
+function runLab3() {
+  const method = document.getElementById('lab3-method').value;
+  const resp = document.getElementById('lab3-response');
+  const fb = document.getElementById('lab3-feedback');
+  resp.style.display = 'block';
+  if (!method) { fb.className='lab-feedback show fail'; fb.innerHTML='Selecione um método.'; return; }
+  if (method === 'X-HTTP-Method-Override') {
+    resp.innerHTML = `<span class="http-200">HTTP/1.1 200 OK</span>
+<span class="http-header-name">Content-Type:</span> <span class="http-value">application/json</span>
+
+<span class="http-value">{"status":"deleted","userId":42,"message":"Usuário removido com sucesso."}</span>`;
+    fb.className = 'lab-feedback show success';
+    fb.innerHTML = '<strong>✓ Lab Concluído!</strong> O header <code>X-HTTP-Method-Override</code> foi aceito pelo servidor, que executou a ação de DELETE mesmo com o token de usuário comum. A aplicação validava o método HTTP visível (POST → 403) mas não validava o método sobreposto pelo header. Esta é uma variação clássica de Verb Tampering com header override.';
+    document.getElementById('lab3-status').className = 'lab-status complete';
+    document.getElementById('lab3-status').textContent = '✓ Concluído';
+    markLabDone(2);
+  } else {
+    const resps = {
+      GET: `<span class="http-403">HTTP/1.1 403 Forbidden</span>\n<span class="http-value">{"error":"Method not allowed for this resource."}</span>`,
+      PUT: `<span class="http-403">HTTP/1.1 403 Forbidden</span>\n<span class="http-value">{"error":"Access denied."}</span>`,
+      OPTIONS: `<span class="http-200">HTTP/1.1 200 OK</span>\n<span class="http-header-name">Allow:</span> <span class="http-value">GET, POST, OPTIONS</span>\n<span class="http-value">{}</span>`,
+    };
+    resp.innerHTML = resps[method] || `<span class="http-403">HTTP/1.1 403 Forbidden</span>`;
+    fb.className = 'lab-feedback show fail';
+    fb.innerHTML = `<strong>Não funcionou com ${method}.</strong> Dica: Alguns servidores aceitam headers customizados para override de método. Procure por headers como <code>X-HTTP-Method-Override</code>.`;
+  }
+}
+
+function updateLab4Id() {
+  const val = document.getElementById('lab4-input').value;
+  document.getElementById('lab4-id-display').textContent = val;
+}
+
+function runLab4() {
+  const id = document.getElementById('lab4-input').value;
+  const resp = document.getElementById('lab4-response');
+  const fb = document.getElementById('lab4-feedback');
+  resp.style.display = 'block';
+  if (id == '1001') {
+    resp.innerHTML = `<span class="http-200">HTTP/1.1 200 OK</span>\n<span class="http-value">{"userId":1001,"name":"Você Mesmo","email":"eu@email.com","plan":"basic"}</span>`;
+    fb.className = 'lab-feedback show fail';
+    fb.innerHTML = 'Este é seu próprio perfil. <strong>Dica:</strong> Tente um ID diferente do seu (1001) para verificar se a aplicação valida autorização.';
+  } else if (id >= 1000 && id <= 9999 && id != '1001') {
+    resp.innerHTML = `<span class="http-200">HTTP/1.1 200 OK</span>\n<span class="http-value">{"userId":${id},"name":"Outro Usuário","email":"outro${id}@email.com","plan":"premium","internalScore":87}</span>`;
+    fb.className = 'lab-feedback show success';
+    fb.innerHTML = `<strong>✓ IDOR Confirmado!</strong> O servidor retornou dados do usuário <code>${id}</code> usando o token de sessão do usuário <code>1001</code>. A aplicação não verificou se o token autenticado tem direito ao recurso solicitado. Note também o campo <code>internalScore</code> que provavelmente não deveria ser exposto via API pública.`;
+    document.getElementById('lab4-status').className = 'lab-status complete';
+    document.getElementById('lab4-status').textContent = '✓ Concluído';
+    markLabDone(3);
+  } else {
+    resp.innerHTML = `<span class="http-403">HTTP/1.1 404 Not Found</span>\n<span class="http-value">{"error":"Usuário não encontrado."}</span>`;
+    fb.className = 'lab-feedback show fail';
+    fb.innerHTML = 'ID não encontrado. <strong>Dica:</strong> Tente IDs numéricos próximos ao seu (1001).';
+  }
+}
+
+function runLab5() {
+  const req = document.getElementById('lab5-request').innerText || document.getElementById('lab5-request').textContent;
+  const resp = document.getElementById('lab5-response');
+  const fb = document.getElementById('lab5-feedback');
+  resp.style.display = 'block';
+
+  const priceMatch = req.match(/"price"\s*:\s*([\d.]+)/);
+  const price = priceMatch ? parseFloat(priceMatch[1]) : 1299.90;
+
+  if (price < 10) {
+    resp.innerHTML = `<span class="http-200">HTTP/1.1 200 OK</span>\n<span class="http-value">{"status":"confirmed","orderId":"ORD-44821","charged":${price.toFixed(2)},"message":"Pedido confirmado. Obrigado pela compra!"}</span>`;
+    fb.className = 'lab-feedback show success';
+    fb.innerHTML = `<strong>✓ Price Tampering Confirmado!</strong> O servidor processou o checkout com o preço de R$${price.toFixed(2)} enviado pelo cliente, sem validar o valor real do produto no backend. Esta é uma falha crítica de Business Logic — o preço nunca deve ser confiado ao cliente. O valor correto deve ser calculado inteiramente server-side com base no ID do produto.`;
+    document.getElementById('lab5-status').className = 'lab-status complete';
+    document.getElementById('lab5-status').textContent = '✓ Concluído';
+    markLabDone(4);
+  } else {
+    resp.innerHTML = `<span class="http-200">HTTP/1.1 200 OK</span>\n<span class="http-value">{"status":"confirmed","orderId":"ORD-44820","charged":${price.toFixed(2)},"message":"Pedido confirmado."}</span>`;
+    fb.className = 'lab-feedback show fail';
+    fb.innerHTML = `O servidor aceitou o preço de R$${price.toFixed(2)}. <strong>Dica:</strong> Altere o campo <code>price</code> para um valor muito menor (ex: 1.00) e reenvie.`;
+  }
+}
+
+function resetLab5() {
+  document.getElementById('lab5-request').innerHTML = `<span class="http-method">POST</span> <span class="http-path">/checkout/confirm</span> <span class="http-version">HTTP/1.1</span>
+<span class="http-header-name">Host:</span> <span class="http-host">shop.target.lab</span>
+<span class="http-header-name">X-Trace-ID:</span> <span class="http-value">edge-7f2a91</span>
+<span class="http-header-name">X-Checkout-Experience:</span> <span class="http-value">v3</span>
+<span class="http-header-name">Content-Type:</span> <span class="http-value">application/json</span>
+<span class="http-header-name">Cookie:</span> <span class="http-value">sess=buyer_token_xyz</span>
+
+<span class="http-body-param">{"productId":"PROD-991","quantity":1,"unitPrice":1299.90,"clientTotal":1299.90,"shippingBand":"gold","telemetry":{"paint":"834ms"},"currency":"BRL"}</span>`;
+  document.getElementById('lab5-response').style.display='none';
+  document.getElementById('lab5-feedback').className='lab-feedback';
+}
+
+function runLab6() {
+  const val = document.querySelector('input[name="lab6q"]:checked');
+  const fb = document.getElementById('lab6-feedback');
+  if (!val) { fb.className='lab-feedback show fail'; fb.innerHTML='Selecione uma conclusão antes de submeter.'; return; }
+  if (val.value === 'b') {
+    fb.className = 'lab-feedback show success';
+    fb.innerHTML = '<strong>✓ Análise Correta!</strong> O servidor retornou HTTP 200 com dados completos do invoice 8802 (pertencente ao owner 8802) usando o token de sessão do usuário 8801. Isso confirma IDOR — a aplicação não validou se o usuário autenticado é o proprietário do recurso solicitado. A evidência direta é o campo <code>"owner":8802</code> no response B, que não corresponde ao usuário autenticado (8801).';
+    document.getElementById('lab6-status').className = 'lab-status complete';
+    document.getElementById('lab6-status').textContent = '✓ Concluído';
+    markLabDone(5);
+  } else {
+    fb.className = 'lab-feedback show fail';
+    fb.innerHTML = 'Análise incorreta. <strong>Dica:</strong> ignore o conforto do HTTP 200 e compare a identidade do recurso com a identidade da sessão. Backend incoerente adora parecer normal em camada de transporte.';
+  }
+}
+
+function goToCompletion() {
+  document.querySelectorAll('.chapter-view').forEach(v => v.classList.remove('active'));
+  document.getElementById('completion-view').classList.add('active');
+  document.getElementById('header-title').textContent = 'Conclusão do Curso';
+  window.scrollTo(0,0);
+}
+
+// ── COMPLETION SCREEN ──
+function buildCompletionScreen() {
+  const div = document.getElementById('completion-view');
+  div.className = 'chapter-view';
+  div.innerHTML = `
+    <div style="text-align:center;padding:60px 48px;max-width:560px;margin:0 auto;">
+      <div class="completion-badge">🎓</div>
+      <div class="completion-title">Curso Concluído!</div>
+      <div class="completion-sub">Você completou o Mini Curso de Burp Suite Community. Agora o request suspeito já não pode mais fingir que era só “comportamento normal do sistema”.</div>
+
+      <div class="cert-form">
+        <label>Seu nome no certificado</label>
+        <input type="text" id="cert-name" placeholder="Nome Completo" maxlength="60">
+        <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="generateCert()" id="gen-cert-btn">🏆 Baixar Certificado PNG</button>
+      </div>
+      <p style="font-size:12px;color:var(--text3);">O certificado em PNG só é liberado após a conclusão total do curso. Em mobile, gere depois de digitar seu nome com calma — o navegador salva melhor quando você não está brigando com o teclado.</p>
+    </div>`;
+}
+
+// ── CERTIFICATE GENERATION ──
+function generateCert() {
+  const name = document.getElementById('cert-name').value.trim();
+  if (!name) { alert('Por favor, insira seu nome para o certificado.'); return; }
+  if (!isAllComplete()) { alert('Conclua todos os capítulos para gerar o certificado.'); return; }
+
+  const canvas = document.getElementById('cert-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 1056;
+  canvas.height = 816;
+
+  // Background
+  ctx.fillStyle = '#0a0c10';
+  ctx.fillRect(0, 0, 1056, 816);
+
+  // Border ornamental
+  ctx.strokeStyle = '#00d4aa';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(32, 32, 992, 752);
+  ctx.strokeStyle = 'rgba(0,212,170,0.2)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(44, 44, 968, 728);
+
+  // Corner accents
+  const corners = [[32,32],[1024,32],[32,784],[1024,784]];
+  corners.forEach(([x,y]) => {
+    ctx.fillStyle = '#00d4aa';
+    ctx.fillRect(x-6, y-6, 12, 12);
+  });
+
+  // Top gradient line
+  const grad = ctx.createLinearGradient(32, 80, 1024, 80);
+  grad.addColorStop(0, 'rgba(0,212,170,0)');
+  grad.addColorStop(0.5, '#00d4aa');
+  grad.addColorStop(1, 'rgba(0,212,170,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(32, 78, 992, 2);
+
+  // Brand
+  ctx.fillStyle = '#00d4aa';
+  ctx.font = 'bold 13px monospace';
+  ctx.letterSpacing = '4px';
+  ctx.textAlign = 'center';
+  ctx.fillText('BE SAFE', 528, 110);
+
+  // Certificate title
+  ctx.fillStyle = '#e8ecf4';
+  ctx.font = 'bold 42px sans-serif';
+  ctx.fillText('Certificado de Conclusão', 528, 200);
+
+  // Subtitle
+  ctx.fillStyle = '#9ba8c0';
+  ctx.font = '18px sans-serif';
+  ctx.fillText('Este certificado atesta que', 528, 265);
+
+  // Name
+  ctx.fillStyle = '#00d4aa';
+  ctx.font = 'bold 48px serif';
+  ctx.fillText(name, 528, 340);
+
+  // Line under name
+  ctx.fillStyle = 'rgba(0,212,170,0.4)';
+  const nameW = Math.min(ctx.measureText(name).width + 40, 700);
+  ctx.fillRect(528 - nameW/2, 355, nameW, 1);
+
+  // Completion text
+  ctx.fillStyle = '#9ba8c0';
+  ctx.font = '17px sans-serif';
+  ctx.fillText('concluiu com aproveitamento o curso', 528, 400);
+
+  ctx.fillStyle = '#e8ecf4';
+  ctx.font = 'bold 22px sans-serif';
+  ctx.fillText('Mini Curso de Burp Suite Community', 528, 440);
+
+  // Details
+  ctx.fillStyle = '#6b7a99';
+  ctx.font = '14px sans-serif';
+  ctx.fillText('Segurança de Aplicações Web · Análise Manual · Pentest · Bug Bounty', 528, 475);
+
+  // Hours box
+  ctx.fillStyle = 'rgba(0,212,170,0.06)';
+  ctx.roundRect ? ctx.roundRect(378, 500, 300, 56, 8) : ctx.rect(378, 500, 300, 56);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(0,212,170,0.3)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillStyle = '#00d4aa';
+  ctx.font = 'bold 28px monospace';
+  ctx.fillText('10 horas', 528, 534);
+  ctx.fillStyle = '#6b7a99';
+  ctx.font = '12px sans-serif';
+  ctx.fillText('CARGA HORÁRIA', 528, 552);
+
+  // Bottom line
+  const grad2 = ctx.createLinearGradient(32, 700, 1024, 700);
+  grad2.addColorStop(0, 'rgba(0,212,170,0)');
+  grad2.addColorStop(0.5, '#00d4aa');
+  grad2.addColorStop(1, 'rgba(0,212,170,0)');
+  ctx.fillStyle = grad2;
+  ctx.fillRect(32, 700, 992, 1);
+
+  // Date
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'});
+  ctx.fillStyle = '#6b7a99';
+  ctx.font = '13px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText(`Data: ${dateStr}`, 80, 730);
+
+  // Instructor
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#9ba8c0';
+  ctx.font = 'bold 16px sans-serif';
+  ctx.fillText('Mariana BS', 976, 725);
+  ctx.fillStyle = '#6b7a99';
+  ctx.font = '13px sans-serif';
+  ctx.fillText('Instrutora · Be Safe', 976, 742);
+
+  // Signature line
+  ctx.fillStyle = 'rgba(0,212,170,0.3)';
+  ctx.fillRect(780, 715, 180, 1);
+
+  // Watermark
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(0,212,170,0.04)';
+  ctx.font = 'bold 120px sans-serif';
+  ctx.fillText('BE SAFE', 528, 620);
+
+    downloadCanvasAsPng(canvas, `certificado-burpsuite-${name.replace(/\s+/g,'-').toLowerCase()}.png`);
+}
+
+
+function parseRawSections(raw) {
+  const normalized = raw.replace(/\r/g, '');
+  const parts = normalized.split('\n\n');
+  const head = parts[0] || normalized;
+  const body = parts.slice(1).join('\n\n');
+  const headLines = head.split('\n');
+  const firstLine = headLines.shift() || '';
+  const headers = [firstLine, ...headLines.filter(Boolean)].join('\n');
+  let params = body.trim();
+  if (!params) params = 'Sem body capturado para esta requisição.';
+  return { raw: normalized, headers, params };
+}
+
+function bindBurpTabs() {
+  document.querySelectorAll('.burp-panel').forEach(panel => {
+    const content = panel.querySelector('.burp-panel-content');
+    const tabs = panel.querySelectorAll('.burp-tab');
+    if (!content || !tabs.length) return;
+    if (!content.dataset.raw) content.dataset.raw = content.innerText;
+    tabs.forEach(tab => {
+      tab.onclick = () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const source = content.dataset.raw || content.innerText;
+        const parsed = parseRawSections(source);
+        const label = tab.innerText.trim().toLowerCase();
+        if (label === 'raw' || label.includes('editável') || label.includes('request original') || label.includes('repeater')) {
+          content.innerText = parsed.raw;
+        } else if (label === 'headers') {
+          content.innerText = parsed.headers;
+        } else if (label === 'params') {
+          content.innerText = parsed.params;
+        }
+      };
+    });
+  });
+}
+
+function downloadCanvasAsPng(canvas, filename) {
+  canvas.toBlob((blob) => {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+  }, 'image/png');
+}
+
+function createPdfFromCanvas(canvas, filename) {
+  const jpeg = canvas.toDataURL('image/jpeg', 0.92);
+  const base64 = jpeg.split(',')[1];
+  const binary = atob(base64);
+  const imgBytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) imgBytes[i] = binary.charCodeAt(i);
+
+  const pageW = 841.89;
+  const pageH = 595.28;
+  const imgW = canvas.width;
+  const imgH = canvas.height;
+  const contentStream = `q\n${pageW} 0 0 ${pageH} 0 0 cm\n/Im0 Do\nQ`;
+
+  const chunks = [];
+  const offsets = [0];
+  let total = 0;
+  const pushStr = (s) => {
+    const bytes = new TextEncoder().encode(s);
+    chunks.push(bytes);
+    total += bytes.length;
+  };
+  const pushBytes = (b) => {
+    chunks.push(b);
+    total += b.length;
+  };
+
+  pushStr('%PDF-1.3\n');
+  offsets.push(total); pushStr('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+  offsets.push(total); pushStr('2 0 obj\n<< /Type /Pages /Count 1 /Kids [3 0 R] >>\nendobj\n');
+  offsets.push(total); pushStr(`3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageW} ${pageH}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>\nendobj\n`);
+  offsets.push(total); pushStr(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${imgW} /Height ${imgH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${imgBytes.length} >>\nstream\n`); pushBytes(imgBytes); pushStr('\nendstream\nendobj\n');
+  const contentBytes = new TextEncoder().encode(contentStream);
+  offsets.push(total); pushStr(`5 0 obj\n<< /Length ${contentBytes.length} >>\nstream\n${contentStream}\nendstream\nendobj\n`);
+  const xrefStart = total;
+  pushStr(`xref\n0 6\n0000000000 65535 f \n`);
+  for (let i = 1; i <= 5; i++) pushStr(`${String(offsets[i]).padStart(10, '0')} 00000 n \n`);
+  pushStr(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`);
+
+  const pdfBlob = new Blob(chunks, { type: 'application/pdf' });
+  const url = URL.createObjectURL(pdfBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ── INIT ──
+function validateState() {
+  if (!state || !Array.isArray(state.chapters) || state.chapters.length !== CHAPTERS.length) {
+    state = {
+      chapters: CHAPTERS.map(() => ({ unlocked: false, contentRead: false, labDone: false, score: 0, answers: [], pendingAnswers: [], complete: false })),
+      currentChapter: 0,
+      consent: false,
+    };
+    state.chapters[0].unlocked = true;
+    saveState();
+    return;
+  }
+
+  state.chapters.forEach((cs, idx) => {
+    if (!Array.isArray(cs.answers)) cs.answers = [];
+    if (!Array.isArray(cs.pendingAnswers)) cs.pendingAnswers = [];
+    if (typeof cs.score !== 'number') cs.score = 0;
+    if (typeof cs.unlocked !== 'boolean') cs.unlocked = idx === 0;
+    if (typeof cs.contentRead !== 'boolean') cs.contentRead = false;
+    if (typeof cs.labDone !== 'boolean') cs.labDone = false;
+    if (typeof cs.complete !== 'boolean') cs.complete = false;
+  });
+}
+
+function init() {
+  loadState();
+  validateState();
+
+  state.chapters.forEach(cs => {
+    if (!cs.answers) cs.answers = [];
+    if (!cs.pendingAnswers) cs.pendingAnswers = [];
+  });
+
+  const container = document.getElementById('chapter-views');
+  CHAPTERS.forEach((ch, i) => {
+    const dom = buildChapterDOM(i);
+    container.appendChild(dom);
+  });
+
+  buildCompletionScreen();
+  renderNav();
+  refreshSaveNotice();
+
+  const cur = state.currentChapter || 0;
+  goToChapter(cur);
+  bindBurpTabs();
+
+  if (restoredFromStorage && state.consent) {
+    const banner = document.getElementById('restore-banner');
+    if (banner) {
+      banner.classList.add('show');
+      banner.innerHTML = '<strong>Progresso restaurado.</strong> O curso retomou o estado salvo neste navegador. Isso funciona apenas aqui, enquanto os dados locais do site forem mantidos.';
+    }
+  }
+
+  setInterval(() => saveState(), 5000);
+  window.addEventListener('beforeunload', saveState);
+
+  if (isAllComplete()) {
+    document.getElementById('completion-view').style.cursor = 'pointer';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
